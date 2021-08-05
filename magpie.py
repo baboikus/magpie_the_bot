@@ -1,43 +1,42 @@
 from task import BACKLOG, TASK_PERFORM_LOG, clear_enviroment, Task, TaskStatus, TaskPerform
 
 class Magpie:
-	def request(self, req):
+	def request(self, user, req):
 		#try:
 			tokens = req.split()
 			command = tokens[0]
 			args = tokens[1:]
 			
-			if command == "/task_add": return self.__dispatch_task_add(args)
-			if command == "/backlog": return self.__dispatch_backlog(args)
-			if command == "/help": return self.__dispatch_help(args)
+			if command == "/task_add": return self.__dispatch_task_add(user, args)
+			if command == "/backlog": return self.__dispatch_backlog(user, args)
+			if command == "/start": return self.__dispatch_start(user, args)
+			if command == "/stop": return self.__dispatch_stop(user, args)
+			if command == "/help": return self.__dispatch_help(user, args)
 			
-			return self.__dispatch_unknown_command(command, args)
+			return self.__dispatch_unknown_command(user, command, args)
 
 		#except Exception as e:
 			#print(e);
 			return "error occurred. use '/help' for list of avaible commands."
 
 
-	def __dispatch_unknown_command(self, command, args):
+	def __dispatch_unknown_command(self, user, command, args):
 		return "unknown command '% s'. use '/help' for list of avaible commands." % command
 
 
-	def __dispatch_task_add(self, args):
+	def __dispatch_task_add(self, user, args):
 		task_id = args[0]
 		tags = args[1:]
-		tags.sort()
 
-		Task(task_id, set(tags), TaskStatus.NEW)
+		task = Task(task_id, set(tags), TaskStatus.NEW)
 
-		response = "% s has been added." % (task_id)
-		if len(tags) > 0:
-			response += " % s relates to % s" % (task_id, tags[0])
-			for tag in tags[1:]: response += ", % s" % tag
-			response += "." 
+		response = "% s has been added." % (task.task_id)
+		if len(task.tags) > 0:
+			response += "\n% s relates to % s." % (task.task_id, task.tags_str()) 
 		return response
 
 
-	def __dispatch_backlog(self, args):
+	def __dispatch_backlog(self, user, args):
 		if len(BACKLOG) == 0: return "backlog is empty."
 
 		response = "backlog:"
@@ -50,12 +49,35 @@ class Magpie:
 		return response
 
 
-	def __dispatch_help(self, args):
+	def __dispatch_help(self, user, args):
 		return "avaible commands:\n/add_task\n/backlog\n/help"
 
 
+	def __dispatch_start(self, user, args):
+		task = BACKLOG[args[0]]
+		task.status = TaskStatus.IN_PROGRESS
 
+		if not (user, task.task_id) in TASK_PERFORM_LOG: TaskPerform(user, task.task_id, 0, 0)
 
+		return "you started working on %s.\n% s relates to % s." % (task.task_id, task.task_id, task.tags_str())
+
+	def __dispatch_stop(self, user, args):
+		task = BACKLOG[args[0]]
+		task.status = TaskStatus.SUSPENDED
+
+		total_time_spent = 0
+		today_time_spent = 0
+		for perform_id in TASK_PERFORM_LOG:
+			if perform_id[1] == task.task_id:
+				perform = TASK_PERFORM_LOG[perform_id] 
+				total_time_spent += perform.total_time_spent
+				if perform_id[0] == user: today_time_spent += perform.today_time_spent
+
+		return "you have finished work on % s.\n" \
+			   "a total of % s hours were spent on % s.\n" \
+			   "today you spent on % s % s hours.\n"\
+			   "please mark the time spent." \
+			   % (task.task_id, total_time_spent, task.task_id, task.task_id, today_time_spent)
 
 
 

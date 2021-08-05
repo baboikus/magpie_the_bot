@@ -8,11 +8,28 @@ def clear_enviroment():
 	BACKLOG.clear()
 	TASK_PERFORM_LOG.clear()
 
+
+def run_time_machine(hours):
+	if hours <= 0: return
+
+	in_progress = set()
+	for task in BACKLOG.values():
+		if task.status == TaskStatus.IN_PROGRESS: in_progress.add(task.task_id)
+
+	for perform_id in TASK_PERFORM_LOG.keys():
+		if perform_id[1] in in_progress:
+			perform = TASK_PERFORM_LOG[perform_id] 
+			perform.total_time_spent += hours
+			perform.today_time_spent += hours
+
+
 class TaskStatus(Enum):
 	UNKNOWN = 1
 	NEW = 2
 	IN_PROGRESS = 3
-	COMPLETE = 4
+	SUSPENDED = 4
+	COMPLETE = 5
+
 
 class Task:
 	def __init__(self, task_id, tags, status):
@@ -21,15 +38,46 @@ class Task:
 		self.status = status
 		BACKLOG[task_id] = self
 
+
 	def __eq__(self, other):
-		return self.task_id == other.task_id and self.tags == other.tags and self.status == other.status
+		return self.task_id == other.task_id \
+			   and self.tags == other.tags \
+			   and self.status == other.status
+
 
 	def __repr__(self): 
 		return "Task id:% s tags:% s status:% s" % (self.task_id, self.tags, self.status)
 
+
+	def tags_str(self):
+		s = ""
+		tags = list(self.tags)
+		tags.sort()
+		if len(tags) > 0: s += tags[0]
+		for tag in tags[1:]: s += ", % s" % tag
+		return s
+
+
 class TaskPerform:
-	def __init__(self, performer_id, task_id, time_spent):
+	def __init__(self, performer_id, task_id, total_time_spent, today_time_spent = 0):
 		self.performer_id = performer_id
 		self.task_id = task_id
-		self.time_spent = time_spent
+		self.total_time_spent = total_time_spent
+		self.today_time_spent = today_time_spent
 		TASK_PERFORM_LOG[(performer_id, task_id)] = self
+
+
+	def __repr__(self): 
+		return "TaskPerform performer_id:% s task_id:% s total_time_spent:% s today_time_spent: % s" \
+			   % (self.performer_id, self.task_id, self.total_time_spent, self.today_time_spent)
+
+
+	def __eq__(self, other):
+		return self.performer_id == other.performer_id \
+			   and self.task_id == other.task_id \
+			   and self.total_time_spent == other.total_time_spent \
+			   and self.today_time_spent == other.today_time_spent
+
+
+
+

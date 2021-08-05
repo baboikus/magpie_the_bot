@@ -21,7 +21,7 @@ class Oracul:
 		prediction = 0.0
 		for record in TASK_PERFORM_LOG.values():
 			if record.task_id in similar_tasks:
-				prediction += record.time_spent
+				prediction += record.total_time_spent
 		prediction /= float(len(similar_tasks))
 
 		return {99 : prediction}
