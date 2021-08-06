@@ -11,6 +11,7 @@ class Magpie:
 			
 			response = ""
 			if command == "/task_add": response = self.__dispatch_task_add(user, args)
+			elif command == "/tag_add": response = self.__dispatch_tag_add(user, args)
 			elif command == "/backlog": response = self.__dispatch_backlog(user, args)
 			elif command == "/start": response = self.__dispatch_start(user, args)
 			elif command == "/stop": response = self.__dispatch_stop(user, args)
@@ -93,6 +94,23 @@ class Magpie:
 			   "today you spent on % s % s hours.\n"\
 			   "please mark the time spent." \
 			   % (task.task_id, total_time_spent, task.task_id, task.task_id, session_time_spent)
+
+	def __dispatch_tag_add(self, user, args):
+		task_id = args[0]
+		tags = set(args[1:])
+		task = BACKLOG[task_id]
+		task.tags |= tags
+
+		return "tags for % s updated. % s now relates to % s." \
+			   % (task.task_id, task.task_id, task.tags_str())
+
+
+
+
+
+
+
+
 
 
 

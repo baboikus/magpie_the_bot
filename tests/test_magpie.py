@@ -88,6 +88,7 @@ def test_backlog():
 	assert len(BACKLOG) == 3
 	assert response == "backlog:\ntask1: tag1, tag2\ntask2: tag3\ntask3: tag1, tag3"
 
+
 def test_start_stop_single_user():
 	clear_enviroment()
 	magpie = Magpie()
@@ -114,6 +115,7 @@ def test_start_stop_single_user():
 					   "a total of 4 hours were spent on task1.\n" \
 					   "today you spent on task1 4 hours.\n" \
 					   "please mark the time spent." 
+
 
 def test_start_stop_many_users():
 	clear_enviroment()
@@ -149,15 +151,20 @@ def test_start_stop_many_users():
 	assert TASK_PERFORM_LOG[("developer2", "task1")] == TaskPerform("developer2", "task1", 3 + 1, 3 + 1)		
 
 
+def test_add_tags():
+	clear_enviroment()
+	magpie = Magpie()
 
+	magpie.request("manager", "/task_add task1")
 
+	assert len(BACKLOG["task1"].tags) == 0
 
+	response = magpie.request("manager", "/tag_add task1 tag1")
 
+	assert BACKLOG["task1"].tags == {"tag1"}
+	assert response == "tags for task1 updated. task1 now relates to tag1."
 
+	response = magpie.request("developer", "/tag_add task1 tag2 tag3")
 
-
-
-
-
-
-
+	assert BACKLOG["task1"].tags == {"tag1", "tag2", "tag3"}
+	assert response == "tags for task1 updated. task1 now relates to tag1, tag2, tag3."

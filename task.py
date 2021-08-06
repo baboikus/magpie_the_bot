@@ -46,7 +46,6 @@ class TaskStatus(Enum):
 	SUSPENDED = 4
 	COMPLETE = 5
 
-
 class Task:
 	def __init__(self, task_id, tags, status):
 		self.task_id = task_id
