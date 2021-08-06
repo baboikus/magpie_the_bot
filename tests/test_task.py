@@ -10,6 +10,7 @@ def test_time_machine():
 
 	TaskPerform("performer_id1", "task_id1", 2)
 	TaskPerform("performer_id2", "task_id1", 0)
+
 	SESSIONS["task_id1"] = {"performer_id1", "performer_id2"}
 
 	TaskPerform("performer_id1", "task_id2", 0)
@@ -24,9 +25,9 @@ def test_time_machine():
 	run_time_machine(12.5)
 
 	assert TASK_PERFORM_LOG[("performer_id1", "task_id1")] \
-		   == TaskPerform("performer_id1", "task_id1", 2 + 12.5, 12.5)
+		   == TaskPerform("performer_id1", "task_id1", 2 + 12.5, [2 + 12.5])
 	assert TASK_PERFORM_LOG[("performer_id2", "task_id1")] \
-	       == TaskPerform("performer_id2", "task_id1", 0 + 12.5, 12.5)
+	       == TaskPerform("performer_id2", "task_id1", 0 + 12.5, [12.5])
 
 	assert TASK_PERFORM_LOG[("performer_id1", "task_id2")] \
 		   == TaskPerform("performer_id1", "task_id2", 0)

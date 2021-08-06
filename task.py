@@ -35,7 +35,7 @@ def run_time_machine(hours):
 			perform = TASK_PERFORM_LOG[perform_id]
 			if perform.performer_id in SESSIONS[perform.task_id]: 
 				perform.total_time_spent += hours
-				perform.session_time_spent += hours
+				perform.sessions_time_spent[-1] += hours
 
 	EVIROMENT_MUTEX.release()
 
@@ -74,24 +74,25 @@ class Task:
 
 
 class TaskPerform:
-	def __init__(self, performer_id, task_id, total_time_spent, session_time_spent = 0):
+	def __init__(self, performer_id, task_id, total_time_spent, sessions_time_spent = None ):
 		self.performer_id = performer_id
 		self.task_id = task_id
 		self.total_time_spent = total_time_spent
-		self.session_time_spent = session_time_spent
+		if sessions_time_spent is None: self.sessions_time_spent = [total_time_spent]
+		else: self.sessions_time_spent = sessions_time_spent
 		TASK_PERFORM_LOG[(performer_id, task_id)] = self
 
 
 	def __repr__(self): 
-		return "TaskPerform performer_id:% s task_id:% s total_time_spent:% s session_time_spent: % s" \
-			   % (self.performer_id, self.task_id, self.total_time_spent, self.session_time_spent)
+		return "TaskPerform performer_id:% s task_id:% s total_time_spent:% s sessions_time_spent: % s" \
+			   % (self.performer_id, self.task_id, self.total_time_spent, self.sessions_time_spent)
 
 
 	def __eq__(self, other):
 		return self.performer_id == other.performer_id \
 			   and self.task_id == other.task_id \
 			   and self.total_time_spent == other.total_time_spent \
-			   and self.session_time_spent == other.session_time_spent
+			   and self.sessions_time_spent == other.sessions_time_spent
 
 
 
