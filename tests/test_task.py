@@ -1,5 +1,4 @@
-from task import BACKLOG, TASK_PERFORM_LOG, clear_enviroment, run_time_machine, Task, TaskStatus, TaskPerform
-
+from task import BACKLOG, TASK_PERFORM_LOG, SESSIONS, clear_enviroment, run_time_machine, Task, TaskStatus, TaskPerform
 
 def test_time_machine():
 	clear_enviroment()
@@ -11,6 +10,7 @@ def test_time_machine():
 
 	TaskPerform("performer_id1", "task_id1", 2)
 	TaskPerform("performer_id2", "task_id1", 0)
+	SESSIONS["task_id1"] = {"performer_id1", "performer_id2"}
 
 	TaskPerform("performer_id1", "task_id2", 0)
 	TaskPerform("performer_id1", "task_id3", 6.2)

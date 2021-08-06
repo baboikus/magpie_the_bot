@@ -1,4 +1,4 @@
-from task import BACKLOG, TASK_PERFORM_LOG, clear_enviroment, Task, TaskStatus, TaskPerform
+from task import BACKLOG, TASK_PERFORM_LOG, SESSIONS, clear_enviroment, Task, TaskStatus, TaskPerform
 
 class Magpie:
 	def request(self, user, req):
@@ -59,25 +59,33 @@ class Magpie:
 
 		if not (user, task.task_id) in TASK_PERFORM_LOG: TaskPerform(user, task.task_id, 0, 0)
 
+		session = SESSIONS.get(task.task_id, set())
+		session.add(user)
+		SESSIONS[task.task_id] = session
+
 		return "you started working on %s.\n% s relates to % s." % (task.task_id, task.task_id, task.tags_str())
 
 	def __dispatch_stop(self, user, args):
 		task = BACKLOG[args[0]]
-		task.status = TaskStatus.SUSPENDED
-
+		
 		total_time_spent = 0
-		today_time_spent = 0
+		session_time_spent = 0
 		for perform_id in TASK_PERFORM_LOG:
 			if perform_id[1] == task.task_id:
 				perform = TASK_PERFORM_LOG[perform_id] 
 				total_time_spent += perform.total_time_spent
-				if perform_id[0] == user: today_time_spent += perform.today_time_spent
+				if perform_id[0] == user: session_time_spent += perform.session_time_spent
+
+		SESSIONS[task.task_id].remove(user)
+		if len(SESSIONS[task.task_id]) == 0:
+			del SESSIONS[task.task_id]
+			task.status = TaskStatus.SUSPENDED
 
 		return "you have finished work on % s.\n" \
 			   "a total of % s hours were spent on % s.\n" \
 			   "today you spent on % s % s hours.\n"\
 			   "please mark the time spent." \
-			   % (task.task_id, total_time_spent, task.task_id, task.task_id, today_time_spent)
+			   % (task.task_id, total_time_spent, task.task_id, task.task_id, session_time_spent)
 
 
 

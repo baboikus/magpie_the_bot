@@ -2,12 +2,13 @@ from enum import Enum
 
 BACKLOG = {}
 TASK_PERFORM_LOG = {}
+SESSIONS = {}
 EVENTS_LOG = {}
 
 def clear_enviroment():
 	BACKLOG.clear()
 	TASK_PERFORM_LOG.clear()
-
+	SESSIONS.clear()
 
 def run_time_machine(hours):
 	if hours <= 0: return
@@ -18,9 +19,10 @@ def run_time_machine(hours):
 
 	for perform_id in TASK_PERFORM_LOG.keys():
 		if perform_id[1] in in_progress:
-			perform = TASK_PERFORM_LOG[perform_id] 
-			perform.total_time_spent += hours
-			perform.today_time_spent += hours
+			perform = TASK_PERFORM_LOG[perform_id]
+			if perform.performer_id in SESSIONS[perform.task_id]: 
+				perform.total_time_spent += hours
+				perform.session_time_spent += hours
 
 
 class TaskStatus(Enum):
@@ -59,24 +61,24 @@ class Task:
 
 
 class TaskPerform:
-	def __init__(self, performer_id, task_id, total_time_spent, today_time_spent = 0):
+	def __init__(self, performer_id, task_id, total_time_spent, session_time_spent = 0):
 		self.performer_id = performer_id
 		self.task_id = task_id
 		self.total_time_spent = total_time_spent
-		self.today_time_spent = today_time_spent
+		self.session_time_spent = session_time_spent
 		TASK_PERFORM_LOG[(performer_id, task_id)] = self
 
 
 	def __repr__(self): 
-		return "TaskPerform performer_id:% s task_id:% s total_time_spent:% s today_time_spent: % s" \
-			   % (self.performer_id, self.task_id, self.total_time_spent, self.today_time_spent)
+		return "TaskPerform performer_id:% s task_id:% s total_time_spent:% s session_time_spent: % s" \
+			   % (self.performer_id, self.task_id, self.total_time_spent, self.session_time_spent)
 
 
 	def __eq__(self, other):
 		return self.performer_id == other.performer_id \
 			   and self.task_id == other.task_id \
 			   and self.total_time_spent == other.total_time_spent \
-			   and self.today_time_spent == other.today_time_spent
+			   and self.session_time_spent == other.session_time_spent
 
 
 

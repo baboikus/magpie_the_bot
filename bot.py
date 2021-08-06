@@ -45,7 +45,6 @@ def magpie_request(update, context):
 message_handler = MessageHandler(Filters.command, magpie_request)
 dispatcher.add_handler(message_handler)
 
-
 def update_state_loop():
   threading.Timer(60.0, update_state_loop).start()
   run_time_machine(1.0 / 60.0) 

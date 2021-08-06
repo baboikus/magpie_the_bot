@@ -1,6 +1,5 @@
-from task import BACKLOG, TASK_PERFORM_LOG, clear_enviroment, run_time_machine, Task, TaskStatus, TaskPerform 
+from task import BACKLOG, TASK_PERFORM_LOG, SESSIONS, clear_enviroment, run_time_machine, Task, TaskStatus, TaskPerform 
 from magpie import Magpie
-
 
 # def test_error():
 # 	clear_enviroment()
@@ -89,29 +88,75 @@ def test_backlog():
 	assert len(BACKLOG) == 3
 	assert response == "backlog:\ntask1: tag1, tag2\ntask2: tag3\ntask3: tag1, tag3"
 
-def test_start_stop1():
+def test_start_stop_single_user():
 	clear_enviroment()
 	magpie = Magpie()
 
 	magpie.request("user1", "/task_add task1 tag1 tag2 tag3")
 
 	assert len(TASK_PERFORM_LOG) == 0
+	assert len(SESSIONS) == 0
 
 	response = magpie.request("user1", "/start task1")
 
 	assert BACKLOG["task1"] == Task("task1", {"tag1", "tag2", "tag3"}, TaskStatus.IN_PROGRESS)
 	assert TASK_PERFORM_LOG[("user1", "task1")] == TaskPerform("user1", "task1", 0, 0)
+	assert SESSIONS["task1"] == {"user1"}
 	assert response == "you started working on task1.\ntask1 relates to tag1, tag2, tag3."
 
 	run_time_machine(4)
 	response = magpie.request("user1", "/stop task1")
 
+	assert len(SESSIONS) == 0
 	assert BACKLOG["task1"] == Task("task1", {"tag1", "tag2", "tag3"}, TaskStatus.SUSPENDED)
 	assert TASK_PERFORM_LOG[("user1", "task1")] == TaskPerform("user1", "task1", 4, 4)
 	assert response == "you have finished work on task1.\n" \
 					   "a total of 4 hours were spent on task1.\n" \
 					   "today you spent on task1 4 hours.\n" \
 					   "please mark the time spent." 
+
+def test_start_stop_many_users():
+	clear_enviroment()
+	magpie = Magpie()
+
+	assert len(SESSIONS) == 0
+
+	magpie.request("manager", "/task_add task1 tag1 tag2")
+	run_time_machine(1)
+	magpie.request("developer1", "/start task1")
+
+	assert SESSIONS["task1"] == {"developer1"}
+
+	run_time_machine(2)
+	magpie.request("developer2", "/start task1")
+
+	assert SESSIONS["task1"] == {"developer1", "developer2"}
+
+	run_time_machine(3)
+	magpie.request("developer1", "/stop task1")
+
+	assert SESSIONS["task1"] == {"developer2"}
+	assert BACKLOG["task1"] == Task("task1", {"tag1", "tag2"}, TaskStatus.IN_PROGRESS)
+	assert TASK_PERFORM_LOG[("developer1", "task1")] == TaskPerform("developer1", "task1", 5, 5)
+	assert TASK_PERFORM_LOG[("developer2", "task1")] == TaskPerform("developer2", "task1", 3, 3)
+
+	run_time_machine(1)
+	magpie.request("developer2", "/stop task1")
+
+	assert len(SESSIONS) == 0
+	assert BACKLOG["task1"] == Task("task1", {"tag1", "tag2"}, TaskStatus.SUSPENDED)
+	assert TASK_PERFORM_LOG[("developer1", "task1")] == TaskPerform("developer1", "task1", 5, 5)
+	assert TASK_PERFORM_LOG[("developer2", "task1")] == TaskPerform("developer2", "task1", 3 + 1, 3 + 1)		
+
+
+
+
+
+
+
+
+
+
 
 
 
