@@ -1,21 +1,28 @@
-from task import BACKLOG, TASK_PERFORM_LOG, SESSIONS, clear_enviroment, Task, TaskStatus, TaskPerform
+from task import BACKLOG, TASK_PERFORM_LOG, SESSIONS, EVIROMENT_MUTEX
+from task import clear_enviroment, Task, TaskStatus, TaskPerform
 
 class Magpie:
 	def request(self, user, req):
+			EVIROMENT_MUTEX.acquire(1)
 		#try:
 			tokens = req.split()
 			command = tokens[0]
 			args = tokens[1:]
 			
-			if command == "/task_add": return self.__dispatch_task_add(user, args)
-			if command == "/backlog": return self.__dispatch_backlog(user, args)
-			if command == "/start": return self.__dispatch_start(user, args)
-			if command == "/stop": return self.__dispatch_stop(user, args)
-			if command == "/help": return self.__dispatch_help(user, args)
-			
-			return self.__dispatch_unknown_command(user, command, args)
+			response = ""
+			if command == "/task_add": response = self.__dispatch_task_add(user, args)
+			elif command == "/backlog": response = self.__dispatch_backlog(user, args)
+			elif command == "/start": response = self.__dispatch_start(user, args)
+			elif command == "/stop": response = self.__dispatch_stop(user, args)
+			elif command == "/help": response = self.__dispatch_help(user, args)
+			else: response = self.__dispatch_unknown_command(user, command, args)
+
+			EVIROMENT_MUTEX.release()
+
+			return response
 
 		#except Exception as e:
+			#EVIROMENT_MUTEX.release()
 			#print(e);
 			return "error occurred. use '/help' for list of avaible commands."
 

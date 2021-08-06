@@ -1,22 +1,30 @@
 from enum import Enum
-import time, threading
+from threading import Timer, Lock
 
 BACKLOG = {}
 TASK_PERFORM_LOG = {}
 SESSIONS = {}
 EVENTS_LOG = {}
 
+EVIROMENT_MUTEX = Lock()
+
 def clear_enviroment():
+	EVIROMENT_MUTEX.acquire(1)
+
 	BACKLOG.clear()
 	TASK_PERFORM_LOG.clear()
 	SESSIONS.clear()
 
+	EVIROMENT_MUTEX.release()
+
 def update_enviroment_loop():
-  threading.Timer(60.0, update_enviroment_loop).start()
+  Timer(60.0, update_enviroment_loop).start()
   run_time_machine(1.0 / 60.0)
 
 def run_time_machine(hours):
 	if hours <= 0: return
+
+	EVIROMENT_MUTEX.acquire(1)
 
 	in_progress = set()
 	for task in BACKLOG.values():
@@ -29,6 +37,7 @@ def run_time_machine(hours):
 				perform.total_time_spent += hours
 				perform.session_time_spent += hours
 
+	EVIROMENT_MUTEX.release()
 
 class TaskStatus(Enum):
 	UNKNOWN = 1
