@@ -1,6 +1,8 @@
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
 
+import datetime
+
 from magpie import Magpie
 from task import update_enviroment_loop
 
@@ -16,8 +18,14 @@ import logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 def magpie_request(update, context):
+    user = update.effective_user.id
+    command = update.message.text
+    print("UTC % s pushed % s <% s>: <% s>" 
+          % (datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'), update.update_id, user, command))
     context.bot.send_message(chat_id=update.effective_chat.id,
-                             text=magpie.request(update.effective_user.id, update.message.text))
+                             text=magpie.request(user, command))
+    print("UTC % s done   % s <% s>: <% s>" 
+          % (datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'), update.update_id, user, command))
 
 message_handler = MessageHandler(Filters.command, magpie_request)
 dispatcher.add_handler(message_handler) 
