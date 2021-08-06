@@ -1,4 +1,5 @@
 from enum import Enum
+import time, threading
 
 BACKLOG = {}
 TASK_PERFORM_LOG = {}
@@ -9,6 +10,10 @@ def clear_enviroment():
 	BACKLOG.clear()
 	TASK_PERFORM_LOG.clear()
 	SESSIONS.clear()
+
+def update_enviroment_loop():
+  threading.Timer(60.0, update_enviroment_loop).start()
+  run_time_machine(1.0 / 60.0)
 
 def run_time_machine(hours):
 	if hours <= 0: return
