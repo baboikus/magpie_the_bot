@@ -22,6 +22,13 @@ def magpie_request(update, context):
 message_handler = MessageHandler(Filters.command, magpie_request)
 dispatcher.add_handler(message_handler) 
 
+init_commands = [
+        "/task_add task1 tag1 tag2",
+        "/task_add task2 tag3",
+        "/task_add task3 tag1 tag2 tag3"
+    ]
+for command in init_commands: magpie.request("init", command)
+
 update_enviroment_loop()
 updater.start_polling()
 

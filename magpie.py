@@ -1,5 +1,5 @@
 from task import BACKLOG, TASK_PERFORM_LOG, SESSIONS, EVIROMENT_MUTEX
-from task import clear_enviroment, Task, TaskStatus, TaskPerform
+from task import clear_enviroment, run_time_machine, Task, TaskStatus, TaskPerform
 
 class Magpie:
 	def request(self, user, req):
@@ -17,6 +17,13 @@ class Magpie:
 			elif command == "/start": response = self.__dispatch_start(user, args)
 			elif command == "/stop": response = self.__dispatch_stop(user, args)
 			elif command == "/help": response = self.__dispatch_help(user, args)
+
+			elif command == "/admin_time_machine":
+				EVIROMENT_MUTEX.release()
+				hours = float(args[0])
+				run_time_machine(hours)
+				return "and so % s hours have passed..." % (hours) 
+
 			else: response = self.__dispatch_unknown_command(user, command, args)
 
 			EVIROMENT_MUTEX.release()
@@ -74,6 +81,7 @@ class Magpie:
 		SESSIONS[task.task_id] = session
 
 		return "you started working on %s.\n% s relates to % s." % (task.task_id, task.task_id, task.tags_str())
+
 
 	def __dispatch_stop(self, user, args):
 		task = BACKLOG[args[0]]
