@@ -1,6 +1,15 @@
 from task import BACKLOG, TASK_PERFORM_LOG, SESSIONS, EVENTS_LOG, EVIROMENT_MUTEX
 from task import clear_enviroment, run_time_machine, Task, TaskStatus, TaskPerform
 
+class Utils:
+	def make_sorted_str(collection):
+		if len(collection) == 0: return ""
+
+		sorted_collection = list(collection)
+		sorted_str = "% s" % (sorted_collection[0])
+		for element in sorted_collection[1:]: sorted_str += ", % s" % (element)
+		return sorted_str
+
 class Magpie:
 	def request(self, user, req):
 			EVIROMENT_MUTEX.acquire(1)
@@ -79,12 +88,18 @@ class Magpie:
 
 		if not (user, task.task_id) in TASK_PERFORM_LOG: TaskPerform(user, task.task_id, 0, [])
 		TASK_PERFORM_LOG[(user, task.task_id)].sessions_time_spent += [0] 
-
+		
 		session = SESSIONS.get(task.task_id, set())
+		who_also_working_on_task_str = ""
+		if len(session) > 0: who_also_working_on_task_str = "% s currently working on % s also." % (Utils.make_sorted_str(session), task.task_id)
+		else: who_also_working_on_task_str = "no one else currently working on % s." % (task.task_id)
+
 		session.add(user)
 		SESSIONS[task.task_id] = session
 
-		return "you started working on %s.\n% s relates to % s." % (task.task_id, task.task_id, task.tags_str())
+		return "you started working on %s.\n" % (task.task_id) \
+			   + "% s relates to % s.\n" % (task.task_id, task.tags_str()) \
+			   + who_also_working_on_task_str
 
 
 	def __dispatch_stop(self, user, args):
