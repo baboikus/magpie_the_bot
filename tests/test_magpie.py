@@ -112,9 +112,23 @@ def test_start_stop_single_user():
 	assert BACKLOG["task1"] == Task("task1", {"tag1", "tag2", "tag3"}, TaskStatus.SUSPENDED)
 	assert TASK_PERFORM_LOG[("user1", "task1")] == TaskPerform("user1", "task1", 4, [4])
 	assert response == "you have finished work on task1.\n" \
-					   "a total of 4 hours were spent on task1.\n" \
-					   "today you spent on task1 4 hours.\n" \
+					   "a total of 4.0 hours were spent on task1.\n" \
+					   "today you spent on task1 4.0 hours.\n" \
 					   "please mark the time spent." 
+
+def test_time_format():
+	clear_enviroment()
+	magpie = Magpie()
+
+	magpie.request("user1", "/task_add task1 tag1 tag2 tag3")
+	magpie.request("user1", "/start task1")
+	run_time_machine(0.49)
+	response = magpie.request("user1", "/stop task1")
+
+	assert response == "you have finished work on task1.\n" \
+				   "a total of 0.5 hours were spent on task1.\n" \
+				   "today you spent on task1 0.5 hours.\n" \
+				   "please mark the time spent." 
 
 
 def test_start_stop_many_users():
@@ -187,12 +201,13 @@ def test_events_spent_time():
 	response = magpie.request("manager", "/events")
 
 	assert response == "events for task1:\n" \
-		   "a total of 15 hours were spent on task1.\n" \
+		   "a total of 15.0 hours were spent on task1.\n" \
 		   "task1 relates to tag1, tag2.\n" \
-		   "developer1 spent 9 hours on task1 in a single session.\n" \
+		   "developer1 spent 9.0 hours on task1 in a single session.\n" \
 		   "\n" \
 		   "no events for task2.\n" \
 		   "\n"
+
 
 def test_events_new_tags():
 	clear_enviroment()

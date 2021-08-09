@@ -22,7 +22,7 @@ class Magpie:
 				EVIROMENT_MUTEX.release()
 				hours = float(args[0])
 				run_time_machine(hours)
-				return "and so % s hours have passed..." % (hours) 
+				return "and so %1.1f hours have passed..." % (hours) 
 
 			else: response = self.__dispatch_unknown_command(user, command, args)
 
@@ -104,8 +104,8 @@ class Magpie:
 			task.status = TaskStatus.SUSPENDED
 
 		return "you have finished work on % s.\n" \
-			   "a total of % s hours were spent on % s.\n" \
-			   "today you spent on % s % s hours.\n"\
+			   "a total of %1.1f hours were spent on % s.\n" \
+			   "today you spent on % s %1.1f hours.\n"\
 			   "please mark the time spent." \
 			   % (task.task_id, total_time_spent, task.task_id, task.task_id, sessions_time_spent)
 
@@ -143,7 +143,7 @@ class Magpie:
 					total_time_spent += perform.total_time_spent
 					for session_time in perform.sessions_time_spent:
 						if session_time >= 8: 
-							task_alerts += "% s spent % s hours on % s in a single session.\n" \
+							task_alerts += "% s spent %1.1f hours on % s in a single session.\n" \
 											% (perform.performer_id, session_time, perform.task_id)
 
 			for event in EVENTS_LOG.get(task.task_id, []):
@@ -152,7 +152,7 @@ class Magpie:
 			if total_time_spent > 0 or len(task_alerts) > 0:
 				response += "events for % s:\n" % (task.task_id)
 				if total_time_spent > 0:
-					response += "a total of % s hours were spent on % s.\n" % (total_time_spent, task.task_id)
+					response += "a total of %1.1f hours were spent on % s.\n" % (total_time_spent, task.task_id)
 				tags_str = task.tags_str()
 				if len(tags_str) > 0: response += "% s relates to % s.\n" % (task.task_id, tags_str)
 				response += task_alerts
