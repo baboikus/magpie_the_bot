@@ -18,7 +18,7 @@ import logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 def magpie_request(update, context):
-    user = update.effective_user.id
+    user = (update.effective_user.last_name + " " + update.effective_user.first_name, update.effective_user.id)
     command = update.message.text
     print("UTC % s pushed % s <% s>: <% s>" 
           % (datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'), update.update_id, user, command))
