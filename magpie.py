@@ -1,14 +1,6 @@
 from task import BACKLOG, TASK_PERFORM_LOG, SESSIONS, EVENTS_LOG, EVIROMENT_MUTEX
 from task import clear_enviroment, run_time_machine, Task, TaskStatus, TaskPerform
-
-class Utils:
-	def make_sorted_str(collection):
-		if len(collection) == 0: return ""
-
-		sorted_collection = list(collection)
-		sorted_str = "% s" % (sorted_collection[0])
-		for element in sorted_collection[1:]: sorted_str += ", % s" % (element)
-		return sorted_str
+import utils
 
 class Magpie:
 	def request(self, user, req):
@@ -73,8 +65,7 @@ class Magpie:
 			tags = list(task.tags)
 			tags.sort()
 			response += "\n% s: " % task.task_id
-			if len(task.tags) > 0: response += tags[0]
-			for tag in tags[1:]: response += ", % s" % tag
+			if len(task.tags) > 0: response += task.tags_str()
 		return response
 
 
@@ -91,7 +82,7 @@ class Magpie:
 		
 		session = SESSIONS.get(task.task_id, set())
 		who_also_working_on_task_str = ""
-		if len(session) > 0: who_also_working_on_task_str = "% s currently working on % s also." % (Utils.make_sorted_str(session), task.task_id)
+		if len(session) > 0: who_also_working_on_task_str = "% s currently working on % s also." % (utils.make_sorted_str(session), task.task_id)
 		else: who_also_working_on_task_str = "no one else currently working on % s." % (task.task_id)
 
 		session.add(user)
@@ -132,9 +123,7 @@ class Magpie:
 		task.tags |= tags
 
 		tags = list(tags)
-		event = "% s added new tags for % s: % s" % (user, task.task_id, tags[0])
-		for tag in tags[1:]: event += ", % s" % (tag)
-		event += "."
+		event = "% s added new tags for % s: % s." % (user, task.task_id, utils.make_sorted_str(tags))
 		if task.task_id in EVENTS_LOG: EVENTS_LOG[task.task_id] += event
 		else: EVENTS_LOG[task.task_id] = [event] 
 

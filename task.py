@@ -1,5 +1,6 @@
 from enum import Enum
 from threading import Timer, Lock
+import utils
 
 BACKLOG = {}
 TASK_PERFORM_LOG = {}
@@ -66,12 +67,7 @@ class Task:
 
 
 	def tags_str(self):
-		s = ""
-		tags = list(self.tags)
-		tags.sort()
-		if len(tags) > 0: s += tags[0]
-		for tag in tags[1:]: s += ", % s" % tag
-		return s
+		return utils.make_sorted_str(self.tags)
 
 
 class TaskPerform:
