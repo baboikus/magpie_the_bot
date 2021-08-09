@@ -14,6 +14,7 @@ def clear_enviroment():
 	BACKLOG.clear()
 	TASK_PERFORM_LOG.clear()
 	SESSIONS.clear()
+	EVENTS_LOG.clear()
 
 	EVIROMENT_MUTEX.release()
 

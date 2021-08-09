@@ -1,4 +1,4 @@
-from task import BACKLOG, TASK_PERFORM_LOG, SESSIONS, EVIROMENT_MUTEX
+from task import BACKLOG, TASK_PERFORM_LOG, SESSIONS, EVENTS_LOG, EVIROMENT_MUTEX
 from task import clear_enviroment, run_time_machine, Task, TaskStatus, TaskPerform
 
 class Magpie:
@@ -116,6 +116,13 @@ class Magpie:
 		task = BACKLOG[task_id]
 		task.tags |= tags
 
+		tags = list(tags)
+		event = "% s added new tags for % s: % s" % (user, task.task_id, tags[0])
+		for tag in tags[1:]: event += ", % s" % (tag)
+		event += "."
+		if task.task_id in EVENTS_LOG: EVENTS_LOG[task.task_id] += event
+		else: EVENTS_LOG[task.task_id] = [event] 
+
 		return "tags for % s updated. % s now relates to % s." \
 			   % (task.task_id, task.task_id, task.tags_str())
 
@@ -129,6 +136,7 @@ class Magpie:
 			task = BACKLOG[task_id]
 			total_time_spent = 0
 			task_alerts = ""
+
 			for perform_id in TASK_PERFORM_LOG.keys():
 				if perform_id[1] == task.task_id:
 					perform = TASK_PERFORM_LOG[perform_id]
@@ -138,9 +146,13 @@ class Magpie:
 							task_alerts += "% s spent % s hours on % s in a single session.\n" \
 											% (perform.performer_id, session_time, perform.task_id)
 
-			if total_time_spent > 0:
+			for event in EVENTS_LOG.get(task.task_id, []):
+				task_alerts += event + "\n"
+
+			if total_time_spent > 0 or len(task_alerts) > 0:
 				response += "events for % s:\n" % (task.task_id)
-				response += "a total of % s hours were spent on % s.\n" % (total_time_spent, task.task_id)
+				if total_time_spent > 0:
+					response += "a total of % s hours were spent on % s.\n" % (total_time_spent, task.task_id)
 				tags_str = task.tags_str()
 				if len(tags_str) > 0: response += "% s relates to % s.\n" % (task.task_id, tags_str)
 				response += task_alerts

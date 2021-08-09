@@ -194,6 +194,21 @@ def test_events_spent_time():
 		   "no events for task2.\n" \
 		   "\n"
 
+def test_events_new_tags():
+	clear_enviroment()
+	magpie = Magpie()
+
+	magpie.request("manager", "/task_add task1 tag1 tag2")
+	run_time_machine(2)
+	magpie.request("developer1", "/tag_add task1 tag3")
+	run_time_machine(4)
+
+	response = magpie.request("manager", "/events")
+
+	assert response == "events for task1:\n" \
+		   "task1 relates to tag1, tag2, tag3.\n" \
+		   "developer1 added new tags for task1: tag3.\n" \
+		   "\n" \
 
 
 
