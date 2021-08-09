@@ -36,6 +36,10 @@ class Magpie:
 			return "error occurred. use '/help' for list of avaible commands."
 
 
+	def request_list(self, user, reqs):
+		for req in reqs: self.request(user, req)
+
+
 	def __dispatch_unknown_command(self, user, command, args):
 		return "unknown command '% s'. use '/help' for list of avaible commands." % command
 

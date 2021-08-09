@@ -35,7 +35,7 @@ init_commands = [
         "/task_add task2 tag3",
         "/task_add task3 tag1 tag2 tag3"
     ]
-for command in init_commands: magpie.request("init", command)
+magpie.request_list("init", init_commands)
 
 update_enviroment_loop()
 updater.start_polling()
