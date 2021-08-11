@@ -1,8 +1,16 @@
-from task import BACKLOG, TASK_PERFORM_LOG, SESSIONS, EVENTS_LOG, EVIROMENT_MUTEX
-from task import clear_enviroment, run_time_machine, Task, TaskStatus, TaskPerform
+from task import BACKLOG, TASK_PERFORM_LOG, SESSIONS, EVENTS_LOG, EVENT_HANDLERS, EVIROMENT_MUTEX
+from task import clear_enviroment, new_event, new_mail, run_time_machine
+from task import Task, TaskStatus, TaskPerform, EventType
 import utils
 
+def crunch_reminder(perform):
+	new_mail(perform.performer_id, "you are working on % s over 8 hours." % (perform.task_id))
+
+
 class Magpie:
+	def init_default_event_handlers(self):
+		EVENT_HANDLERS[EventType.CRUNCH] = crunch_reminder 
+
 	def request(self, user, req):
 			EVIROMENT_MUTEX.acquire(1)
 		#try:
@@ -123,9 +131,9 @@ class Magpie:
 		task.tags |= tags
 
 		tags = list(tags)
-		event = "% s added new tags for % s: % s." % (user, task.task_id, utils.make_sorted_str(tags))
-		if task.task_id in EVENTS_LOG: EVENTS_LOG[task.task_id] += event
-		else: EVENTS_LOG[task.task_id] = [event] 
+		new_event(task.task_id, 
+				  "% s added new tags for % s: % s." \
+				  % (user, task.task_id, utils.make_sorted_str(tags)))
 
 		return "tags for % s updated. % s now relates to % s." \
 			   % (task.task_id, task.task_id, task.tags_str())

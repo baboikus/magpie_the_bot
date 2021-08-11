@@ -1,5 +1,8 @@
-from task import BACKLOG, TASK_PERFORM_LOG, SESSIONS, clear_enviroment, run_time_machine, Task, TaskStatus, TaskPerform 
-from magpie import Magpie
+from task import BACKLOG, TASK_PERFORM_LOG, SESSIONS, EVENTS_LOG, EVENT_HANDLERS, MAILBOX
+from task import clear_enviroment, run_time_machine
+from task import Task, TaskStatus, TaskPerform, EventType
+
+from magpie import Magpie, crunch_reminder
 
 # def test_error():
 # 	clear_enviroment()
@@ -237,6 +240,44 @@ def test_events_new_tags():
 		   "task1 relates to tag1, tag2, tag3.\n" \
 		   "developer1 added new tags for task1: tag3.\n" \
 		   "\n" \
+
+
+def test_crunch_reminder():
+	clear_enviroment()
+	EVENT_HANDLERS[EventType.CRUNCH] = crunch_reminder 
+
+	magpie = Magpie()
+
+	magpie.request("manager", "/task_add task1 tag1 tag2")
+	magpie.request("developer1", "/start task1")
+	run_time_machine(7)
+
+	assert len(EVENTS_LOG) == 0
+	assert len(MAILBOX) == 0
+
+	run_time_machine(1.5)
+
+	assert len(EVENTS_LOG) == 0
+	assert len(MAILBOX) == 1
+
+	assert MAILBOX == [("developer1", "you are working on task1 over 8 hours.")]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

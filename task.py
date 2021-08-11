@@ -7,7 +7,25 @@ TASK_PERFORM_LOG = {}
 SESSIONS = {}
 EVENTS_LOG = {}
 
+EVENT_HANDLERS = {}
+MAILBOX = []
+
+SEND_MESSAGE_TO = {}
+
 EVIROMENT_MUTEX = Lock()
+
+def new_event(task_id, event):
+	if task_id in EVENTS_LOG: EVENTS_LOG[task_id] += event
+	else: EVENTS_LOG[task_id] = [event] 
+
+def new_mail(user_id, message):
+	global MAILBOX
+	MAILBOX += [(user_id, message)]
+
+
+class EventType(Enum):
+	CRUNCH = 0
+
 
 def clear_enviroment():
 	EVIROMENT_MUTEX.acquire(1)
@@ -16,12 +34,28 @@ def clear_enviroment():
 	TASK_PERFORM_LOG.clear()
 	SESSIONS.clear()
 	EVENTS_LOG.clear()
+	EVENT_HANDLERS.clear()
+	MAILBOX.clear()
 
 	EVIROMENT_MUTEX.release()
+
 
 def update_enviroment_loop():
   Timer(60.0, update_enviroment_loop).start()
   run_time_machine(1.0 / 60.0)
+
+def update_mailbox_loop():
+	EVIROMENT_MUTEX.acquire(1)
+
+	for mail in MAILBOX:
+		print("sending message to % s: % s" % (mail[0], mail[1]))
+		SEND_MESSAGE_TO[mail[0]](mail[1])
+	MAILBOX.clear()
+
+	EVIROMENT_MUTEX.release()
+
+	Timer(10.0, update_mailbox_loop).start()
+
 
 def run_time_machine(hours):
 	if hours <= 0: return
@@ -39,7 +73,12 @@ def run_time_machine(hours):
 				perform.total_time_spent += hours
 				perform.sessions_time_spent[-1] += hours
 
+	if EventType.CRUNCH in EVENT_HANDLERS:
+		for perform in TASK_PERFORM_LOG.values():
+			if perform.sessions_time_spent[-1] > 8.0: EVENT_HANDLERS[EventType.CRUNCH](perform)
+
 	EVIROMENT_MUTEX.release()
+
 
 class TaskStatus(Enum):
 	UNKNOWN = 1
@@ -47,6 +86,7 @@ class TaskStatus(Enum):
 	IN_PROGRESS = 3
 	SUSPENDED = 4
 	COMPLETE = 5
+
 
 class Task:
 	def __init__(self, task_id, tags, status):
