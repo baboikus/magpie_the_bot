@@ -41,7 +41,6 @@ class Magpie:
 			return response
 
 		#except Exception as e:
-			#EVIROMENT_MUTEX.release()
 			#print(e);
 			return "error occurred. use '/help' for list of avaible commands."
 
@@ -73,6 +72,7 @@ class Magpie:
 			tags = list(task.tags)
 			tags.sort()
 			response += "\n% s: " % task.task_id
+			x = []
 			if len(task.tags) > 0: response += task.tags_str()
 		return response
 
@@ -117,7 +117,7 @@ class Magpie:
 			del SESSIONS[task.task_id]
 			task.status = TaskStatus.SUSPENDED
 
-		return messages.stop({"task_id": task.task_id, "total_time_spent": total_time_spent, "sessions_time_spent": sessions_time_spent})
+		return messages.task_stop(task.task_id, total_time_spent, sessions_time_spent)
 
 
 	def __dispatch_tag_add(self, user, args):
