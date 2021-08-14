@@ -16,7 +16,7 @@ class Magpie:
 		return run_atomic_state_action(self.__request, (user, req))
 
 	def __request(self, user, req):
-		#try:
+		try:
 			tokens = req.split()
 			command = tokens[0]
 			args = tokens[1:]
@@ -34,17 +34,18 @@ class Magpie:
 				or command == "/weekly_report": response = "there is no implementations for '% s' command. YET." % command
 
 			elif command == "/admin_time_machine":
-				end_atomic_state_action()
 				hours = float(args[0])
 				run_time_machine(hours)
 				return "and so %1.1f hours have passed..." % (hours) 
+
+			elif command == "/admin_botfather_help": return messages.botfather_help()
 
 			else: response = self.__dispatch_unknown_command(user, command, args)
 			
 			return response
 
-		#except Exception as e:
-			#print(e);
+		except Exception as e:
+			print(e);
 			return "error occurred. use '/help' for list of avaible commands."
 
 	def request_list(self, user, reqs):
@@ -77,7 +78,7 @@ class Magpie:
 
 
 	def __dispatch_help(self, user, args):
-		return "avaible commands:\n/add_task\n/backlog\n/help"
+		return messages.help_response()
 
 
 	def __dispatch_start(self, user, args):
@@ -116,7 +117,7 @@ class Magpie:
 			del SESSIONS[task.task_id]
 			task.status = TaskStatus.SUSPENDED
 
-		return messages.task_stop(task.task_id, total_time_spent, sessions_time_spent)
+		return messages.task_stop_response(task.task_id, total_time_spent, sessions_time_spent)
 
 
 	def __dispatch_tag_add(self, user, args):

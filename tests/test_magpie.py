@@ -4,13 +4,13 @@ from task import Task, TaskStatus, TaskPerform, EventType
 
 from magpie import Magpie, crunch_reminder
 
-# def test_error():
-# 	clear_enviroment()
-# 	magpie = Magpie()
+def test_error():
+	clear_enviroment()
+	magpie = Magpie()
 
-# 	response = magpie.request("user1", "")
+	response = magpie.request("user1", "")
 
-# 	assert response == "error occurred. use '/help' for list of avaible commands."
+	assert response == "error occurred. use '/help' for list of avaible commands."
 
 
 def test_unknown_command():
