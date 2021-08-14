@@ -263,8 +263,22 @@ def test_crunch_reminder():
 	assert MAILBOX == [("developer1", "you are working on task1 over 8 hours.")]
 
 
+def test_daily_report():
+	clear_enviroment()
+	magpie = Magpie()
+
+	response = magpie.request("manager", "/daily_report")
+
+	assert response == "there is no implementations for '/daily_report' command. YET."
 
 
+def test_weekly_report():
+	clear_enviroment()
+	magpie = Magpie()
+
+	response = magpie.request("manager", "/weekly_report")
+
+	assert response == "there is no implementations for '/weekly_report' command. YET."
 
 
 

@@ -30,6 +30,9 @@ class Magpie:
 			elif command == "/task_stop": response = self.__dispatch_stop(user, args)
 			elif command == "/help": response = self.__dispatch_help(user, args)
 
+			elif command == "/daily_report" \
+				or command == "/weekly_report": response = "there is no implementations for '% s' command. YET." % command
+
 			elif command == "/admin_time_machine":
 				end_atomic_state_action()
 				hours = float(args[0])
@@ -69,11 +72,7 @@ class Magpie:
 
 		response = "backlog:"
 		for task in fetch_all_tasks():
-			tags = list(task.tags)
-			tags.sort()
-			response += "\n% s: " % task.task_id
-			x = []
-			if len(task.tags) > 0: response += task.tags_str()
+			response += "\n% s: %s" % (task.task_id, utils.make_sorted_str(task.tags))
 		return response
 
 
