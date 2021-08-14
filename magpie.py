@@ -23,8 +23,8 @@ class Magpie:
 			elif command == "/tag_add": response = self.__dispatch_tag_add(user, args)
 			elif command == "/backlog": response = self.__dispatch_backlog(user, args)
 			elif command == "/events": response = self.__dispatch_events(user, args) 
-			elif command == "/start": response = self.__dispatch_start(user, args)
-			elif command == "/stop": response = self.__dispatch_stop(user, args)
+			elif command == "/task_start": response = self.__dispatch_start(user, args)
+			elif command == "/task_stop": response = self.__dispatch_stop(user, args)
 			elif command == "/help": response = self.__dispatch_help(user, args)
 
 			elif command == "/admin_time_machine":

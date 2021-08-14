@@ -101,7 +101,7 @@ def test_start_stop_single_user():
 	assert len(TASK_PERFORM_LOG) == 0
 	assert len(SESSIONS) == 0
 
-	response = magpie.request("user1", "/start task1")
+	response = magpie.request("user1", "/task_start task1")
 
 	assert BACKLOG["task1"] == Task("task1", {"tag1", "tag2", "tag3"}, TaskStatus.IN_PROGRESS)
 	assert TASK_PERFORM_LOG[("user1", "task1")] == TaskPerform("user1", "task1", 0, [0])
@@ -111,7 +111,7 @@ def test_start_stop_single_user():
 					   "no one else currently working on task1."
 
 	run_time_machine(4)
-	response = magpie.request("user1", "/stop task1")
+	response = magpie.request("user1", "/task_stop task1")
 
 	assert len(SESSIONS) == 0
 	assert BACKLOG["task1"] == Task("task1", {"tag1", "tag2", "tag3"}, TaskStatus.SUSPENDED)
@@ -126,9 +126,9 @@ def test_time_format():
 	magpie = Magpie()
 
 	magpie.request("user1", "/task_add task1 tag1 tag2 tag3")
-	magpie.request("user1", "/start task1")
+	magpie.request("user1", "/task_start task1")
 	run_time_machine(0.49)
-	response = magpie.request("user1", "/stop task1")
+	response = magpie.request("user1", "/task_stop task1")
 
 	assert response == "you have finished work on task1.\n" \
 				   "a total of 0.5 hours were spent on task1.\n" \
@@ -144,28 +144,28 @@ def test_start_stop_many_users():
 
 	magpie.request("manager", "/task_add task1 tag1 tag2")
 	run_time_machine(1)
-	magpie.request("developer1", "/start task1")
+	magpie.request("developer1", "/task_start task1")
 
 	assert SESSIONS["task1"] == {"developer1"}
 
 	run_time_machine(2)
-	response = magpie.request("developer2", "/start task1")
+	response = magpie.request("developer2", "/task_start task1")
 
 	assert SESSIONS["task1"] == {"developer1", "developer2"}
 	assert response == "you started working on task1.\n" \
 					   "task1 relates to tag1, tag2.\n" \
 					   "developer1 currently working on task1 also."
 
-	response = magpie.request("developer3", "/start task1")
+	response = magpie.request("developer3", "/task_start task1")
 
 	assert SESSIONS["task1"] == {"developer1", "developer2", "developer3"}
 	assert response == "you started working on task1.\n" \
 					   "task1 relates to tag1, tag2.\n" \
 					   "developer1, developer2 currently working on task1 also."
 
-	magpie.request("developer3", "/stop task1")
+	magpie.request("developer3", "/task_stop task1")
 	run_time_machine(3)
-	magpie.request("developer1", "/stop task1")
+	magpie.request("developer1", "/task_stop task1")
 
 	assert SESSIONS["task1"] == {"developer2"}
 	assert BACKLOG["task1"] == Task("task1", {"tag1", "tag2"}, TaskStatus.IN_PROGRESS)
@@ -173,7 +173,7 @@ def test_start_stop_many_users():
 	assert TASK_PERFORM_LOG[("developer2", "task1")] == TaskPerform("developer2", "task1", 3, [3])
 
 	run_time_machine(1)
-	magpie.request("developer2", "/stop task1")
+	magpie.request("developer2", "/task_stop task1")
 
 	assert len(SESSIONS) == 0
 	assert BACKLOG["task1"] == Task("task1", {"tag1", "tag2"}, TaskStatus.SUSPENDED)
@@ -206,13 +206,13 @@ def test_events_spent_time():
 
 	magpie.request("manager", "/task_add task1 tag1 tag2")
 	magpie.request("manager", "/task_add task2 tag1 tag3")
-	magpie.request("developer1", "/start task1")
+	magpie.request("developer1", "/task_start task1")
 	run_time_machine(4)
-	magpie.request("developer2", "/start task1")
+	magpie.request("developer2", "/task_start task1")
 	run_time_machine(5)
-	magpie.request("developer1", "/stop task1")
+	magpie.request("developer1", "/task_stop task1")
 	run_time_machine(1)	
-	magpie.request("developer2", "/stop task1")
+	magpie.request("developer2", "/task_stop task1")
 
 	response = magpie.request("manager", "/events")
 
@@ -249,7 +249,7 @@ def test_crunch_reminder():
 	magpie = Magpie()
 
 	magpie.request("manager", "/task_add task1 tag1 tag2")
-	magpie.request("developer1", "/start task1")
+	magpie.request("developer1", "/task_start task1")
 	run_time_machine(7)
 
 	assert len(EVENTS_LOG) == 0
