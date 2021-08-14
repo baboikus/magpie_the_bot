@@ -12,7 +12,7 @@ COMMANDS = [
 ]
 
 def help_response():
-	response = ""
+	response = "avaible commands:\n"
 	for command, args, description in COMMANDS:
 		response += "/% s % s - % s\n" % (command, args, description)
 	return response

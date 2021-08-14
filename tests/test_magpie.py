@@ -22,13 +22,22 @@ def test_unknown_command():
 	assert response == "unknown command 'task_add'. use '/help' for list of avaible commands."
 
 
+def test_admin_time_machine():
+	clear_enviroment()
+	magpie = Magpie()
+
+	response = magpie.request("admin", "/admin_time_machine 12.49")
+
+	assert response == "and so 12.5 hours have passed..."
+
+
 def test_help():
 	clear_enviroment()
 	magpie = Magpie()
 
 	response = magpie.request("user1", "/help")
 
-	assert response == "avaible commands:\n/add_task\n/backlog\n/help"	
+	assert response.startswith("avaible commands:\n")	
 
 
 def test_add_task1():
