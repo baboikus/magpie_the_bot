@@ -2,6 +2,7 @@ from task import TASK_PERFORM_LOG, SESSIONS, EVENTS_LOG, EVENT_HANDLERS
 from task import clear_enviroment, run_atomic_state_action, new_event, new_mail, run_time_machine, backlog_len, fetch_task, fetch_all_tasks, fetch_all_tasks_ids
 from task import Task, TaskStatus, TaskPerform, EventType
 import utils
+import messages
 
 def crunch_reminder(perform):
 	new_mail(perform.performer_id, "you are working on % s over 8 hours." % (perform.task_id))
@@ -116,11 +117,7 @@ class Magpie:
 			del SESSIONS[task.task_id]
 			task.status = TaskStatus.SUSPENDED
 
-		return "you have finished work on % s.\n" \
-			   "a total of %1.1f hours were spent on % s.\n" \
-			   "today you spent on % s %1.1f hours.\n"\
-			   "please mark the time spent." \
-			   % (task.task_id, total_time_spent, task.task_id, task.task_id, sessions_time_spent)
+		return messages.stop({"task_id": task.task_id, "total_time_spent": total_time_spent, "sessions_time_spent": sessions_time_spent})
 
 
 	def __dispatch_tag_add(self, user, args):
