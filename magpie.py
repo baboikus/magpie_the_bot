@@ -13,40 +13,39 @@ class Magpie:
 		EVENT_HANDLERS[EventType.CRUNCH] = crunch_reminder 
 
 	def request(self, user, req):
-		return run_atomic_state_action(self.__request, (user, req))
-
-	def __request(self, user, req):
 		try:
 			tokens = req.split()
 			command = tokens[0]
 			args = tokens[1:]
-			
-			response = ""
-			if command == "/task_add": response = self.__dispatch_task_add(user, args)
-			elif command == "/tag_add": response = self.__dispatch_tag_add(user, args)
-			elif command == "/backlog": response = self.__dispatch_backlog(user, args)
-			elif command == "/events": response = self.__dispatch_events(user, args) 
-			elif command == "/task_start": response = self.__dispatch_start(user, args)
-			elif command == "/task_stop": response = self.__dispatch_stop(user, args)
-			elif command == "/help": response = self.__dispatch_help(user, args)
 
-			elif command == "/daily_report" \
-				or command == "/weekly_report": response = "there is no implementations for '% s' command. YET." % command
-
-			elif command == "/admin_time_machine":
+			### admin commands block >>>
+			if command == "/admin_time_machine":
 				hours = float(args[0])
 				run_time_machine(hours)
 				return "and so %1.1f hours have passed..." % (hours) 
-
 			elif command == "/admin_botfather_help": return messages.botfather_help()
+			### <<< admin commands block 
 
-			else: response = self.__dispatch_unknown_command(user, command, args)
-			
-			return response
+			def action():
+				response = ""
+				if command == "/task_add": response = self.__dispatch_task_add(user, args)
+				elif command == "/tag_add": response = self.__dispatch_tag_add(user, args)
+				elif command == "/backlog": response = self.__dispatch_backlog(user, args)
+				elif command == "/events": response = self.__dispatch_events(user, args) 
+				elif command == "/task_start": response = self.__dispatch_start(user, args)
+				elif command == "/task_stop": response = self.__dispatch_stop(user, args)
+				elif command == "/help": response = self.__dispatch_help(user, args)
+				elif command == "/daily_report" \
+					or command == "/weekly_report": response = "there is no implementations for '% s' command. YET." % command
+				else: response = self.__dispatch_unknown_command(user, command, args)
+				return response
+
+			return run_atomic_state_action(action)
 
 		except Exception as e:
 			print(e);
 			return "error occurred. use '/help' for list of avaible commands."
+
 
 	def request_list(self, user, reqs):
 		for req in reqs: self.request(user, req)
