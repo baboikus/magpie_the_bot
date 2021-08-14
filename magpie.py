@@ -1,5 +1,5 @@
-from task import TASK_PERFORM_LOG, SESSIONS, EVENTS_LOG, EVENT_HANDLERS, EVIROMENT_MUTEX
-from task import clear_enviroment, new_event, new_mail, run_time_machine, backlog_len, fetch_task, fetch_all_tasks, fetch_all_tasks_ids
+from task import TASK_PERFORM_LOG, SESSIONS, EVENTS_LOG, EVENT_HANDLERS
+from task import clear_enviroment, run_atomic_state_action, new_event, new_mail, run_time_machine, backlog_len, fetch_task, fetch_all_tasks, fetch_all_tasks_ids
 from task import Task, TaskStatus, TaskPerform, EventType
 import utils
 
@@ -12,7 +12,9 @@ class Magpie:
 		EVENT_HANDLERS[EventType.CRUNCH] = crunch_reminder 
 
 	def request(self, user, req):
-			EVIROMENT_MUTEX.acquire(1)
+		return run_atomic_state_action(self.__request, (user, req))
+
+	def __request(self, user, req):
 		#try:
 			tokens = req.split()
 			command = tokens[0]
@@ -28,22 +30,19 @@ class Magpie:
 			elif command == "/help": response = self.__dispatch_help(user, args)
 
 			elif command == "/admin_time_machine":
-				EVIROMENT_MUTEX.release()
+				end_atomic_state_action()
 				hours = float(args[0])
 				run_time_machine(hours)
 				return "and so %1.1f hours have passed..." % (hours) 
 
 			else: response = self.__dispatch_unknown_command(user, command, args)
-
-			EVIROMENT_MUTEX.release()
-
+			
 			return response
 
 		#except Exception as e:
 			#EVIROMENT_MUTEX.release()
 			#print(e);
 			return "error occurred. use '/help' for list of avaible commands."
-
 
 	def request_list(self, user, reqs):
 		for req in reqs: self.request(user, req)

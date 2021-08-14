@@ -13,6 +13,19 @@ MAILBOX = []
 SEND_MESSAGE_TO = {}
 
 EVIROMENT_MUTEX = Lock()
+def run_atomic_state_action(action, args=None):
+	EVIROMENT_MUTEX.acquire(1)
+	try:
+		r = None
+		if args is None: r = action()
+		elif len(args) == 1: r = action(args[0])
+		elif len(args) == 2: r = action(args[0], args[1])
+		elif len(args) == 3: r = action(args[0], args[1], args[2])
+		EVIROMENT_MUTEX.release()
+		return r
+	except Exception as e:
+		EVIROMENT_MUTEX.release()
+		raise e 
 
 def new_event(task_id, event):
 	if task_id in EVENTS_LOG: EVENTS_LOG[task_id] += event
@@ -28,16 +41,15 @@ class EventType(Enum):
 
 
 def clear_enviroment():
-	EVIROMENT_MUTEX.acquire(1)
+	def action():
+		BACKLOG.clear()
+		TASK_PERFORM_LOG.clear()
+		SESSIONS.clear()
+		EVENTS_LOG.clear()
+		EVENT_HANDLERS.clear()
+		MAILBOX.clear()
 
-	BACKLOG.clear()
-	TASK_PERFORM_LOG.clear()
-	SESSIONS.clear()
-	EVENTS_LOG.clear()
-	EVENT_HANDLERS.clear()
-	MAILBOX.clear()
-
-	EVIROMENT_MUTEX.release()
+	run_atomic_state_action(action)
 
 
 def update_enviroment_loop():
@@ -45,39 +57,36 @@ def update_enviroment_loop():
   run_time_machine(1.0 / 60.0)
 
 def update_mailbox_loop():
-	EVIROMENT_MUTEX.acquire(1)
+	def action():
+		for mail in MAILBOX:
+			print("sending message to % s: % s" % (mail[0], mail[1]))
+			SEND_MESSAGE_TO[mail[0]](mail[1])
+		MAILBOX.clear()
 
-	for mail in MAILBOX:
-		print("sending message to % s: % s" % (mail[0], mail[1]))
-		SEND_MESSAGE_TO[mail[0]](mail[1])
-	MAILBOX.clear()
-
-	EVIROMENT_MUTEX.release()
+	run_atomic_state_action(action)
 
 	Timer(10.0, update_mailbox_loop).start()
 
 
 def run_time_machine(hours):
 	if hours <= 0: return
+	def action():
+		in_progress = set()
+		for task in BACKLOG.values():
+			if task.status == TaskStatus.IN_PROGRESS: in_progress.add(task.task_id)
 
-	EVIROMENT_MUTEX.acquire(1)
+		for perform_id in TASK_PERFORM_LOG.keys():
+			if perform_id[1] in in_progress:
+				perform = TASK_PERFORM_LOG[perform_id]
+				if perform.performer_id in SESSIONS[perform.task_id]: 
+					perform.total_time_spent += hours
+					perform.sessions_time_spent[-1] += hours
 
-	in_progress = set()
-	for task in BACKLOG.values():
-		if task.status == TaskStatus.IN_PROGRESS: in_progress.add(task.task_id)
+		if EventType.CRUNCH in EVENT_HANDLERS:
+			for perform in TASK_PERFORM_LOG.values():
+				if perform.sessions_time_spent[-1] > 8.0: EVENT_HANDLERS[EventType.CRUNCH](perform)
+	run_atomic_state_action(action)
 
-	for perform_id in TASK_PERFORM_LOG.keys():
-		if perform_id[1] in in_progress:
-			perform = TASK_PERFORM_LOG[perform_id]
-			if perform.performer_id in SESSIONS[perform.task_id]: 
-				perform.total_time_spent += hours
-				perform.sessions_time_spent[-1] += hours
-
-	if EventType.CRUNCH in EVENT_HANDLERS:
-		for perform in TASK_PERFORM_LOG.values():
-			if perform.sessions_time_spent[-1] > 8.0: EVENT_HANDLERS[EventType.CRUNCH](perform)
-
-	EVIROMENT_MUTEX.release()
 
 def backlog_len(): return len(BACKLOG)
 def fetch_task(task_id): return BACKLOG[task_id]
@@ -115,7 +124,7 @@ class Task:
 
 
 class TaskPerform:
-	def __init__(self, performer_id, task_id, total_time_spent, sessions_time_spent = None ):
+	def __init__(self, performer_id, task_id, total_time_spent, sessions_time_spent=None ):
 		self.performer_id = performer_id
 		self.task_id = task_id
 		self.total_time_spent = total_time_spent
