@@ -1,5 +1,5 @@
-from task import BACKLOG, TASK_PERFORM_LOG, SESSIONS, EVENTS_LOG, EVENT_HANDLERS, EVIROMENT_MUTEX
-from task import clear_enviroment, new_event, new_mail, run_time_machine
+from task import TASK_PERFORM_LOG, SESSIONS, EVENTS_LOG, EVENT_HANDLERS, EVIROMENT_MUTEX
+from task import clear_enviroment, new_event, new_mail, run_time_machine, backlog_len, fetch_task, fetch_all_tasks, fetch_all_tasks_ids
 from task import Task, TaskStatus, TaskPerform, EventType
 import utils
 
@@ -66,10 +66,10 @@ class Magpie:
 
 
 	def __dispatch_backlog(self, user, args):
-		if len(BACKLOG) == 0: return "backlog is empty."
+		if backlog_len() == 0: return "backlog is empty."
 
 		response = "backlog:"
-		for task in BACKLOG.values():
+		for task in fetch_all_tasks():
 			tags = list(task.tags)
 			tags.sort()
 			response += "\n% s: " % task.task_id
@@ -82,7 +82,7 @@ class Magpie:
 
 
 	def __dispatch_start(self, user, args):
-		task = BACKLOG[args[0]]
+		task = fetch_task(args[0])
 		task.status = TaskStatus.IN_PROGRESS
 
 		if not (user, task.task_id) in TASK_PERFORM_LOG: TaskPerform(user, task.task_id, 0, [])
@@ -102,7 +102,7 @@ class Magpie:
 
 
 	def __dispatch_stop(self, user, args):
-		task = BACKLOG[args[0]]
+		task = fetch_task(args[0])
 		
 		total_time_spent = 0
 		sessions_time_spent = 0
@@ -127,7 +127,7 @@ class Magpie:
 	def __dispatch_tag_add(self, user, args):
 		task_id = args[0]
 		tags = set(args[1:])
-		task = BACKLOG[task_id]
+		task = fetch_task(task_id)
 		task.tags |= tags
 
 		tags = list(tags)
@@ -140,12 +140,12 @@ class Magpie:
 
 
 	def __dispatch_events(self, user, args):
-		all_tasks = list(BACKLOG.keys())
+		all_tasks = list(fetch_all_tasks_ids())
 		all_tasks.sort()
 
 		response = ""
 		for task_id in all_tasks:
-			task = BACKLOG[task_id]
+			task = fetch_task(task_id)
 			total_time_spent = 0
 			task_alerts = ""
 

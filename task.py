@@ -79,6 +79,10 @@ def run_time_machine(hours):
 
 	EVIROMENT_MUTEX.release()
 
+def backlog_len(): return len(BACKLOG)
+def fetch_task(task_id): return BACKLOG[task_id]
+def fetch_all_tasks(): return BACKLOG.values()
+def fetch_all_tasks_ids(): return BACKLOG.keys()
 
 class TaskStatus(Enum):
 	UNKNOWN = 1

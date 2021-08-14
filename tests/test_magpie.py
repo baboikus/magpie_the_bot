@@ -1,5 +1,5 @@
-from task import BACKLOG, TASK_PERFORM_LOG, SESSIONS, EVENTS_LOG, EVENT_HANDLERS, MAILBOX
-from task import clear_enviroment, run_time_machine
+from task import TASK_PERFORM_LOG, SESSIONS, EVENTS_LOG, EVENT_HANDLERS, MAILBOX
+from task import clear_enviroment, run_time_machine, backlog_len, fetch_task
 from task import Task, TaskStatus, TaskPerform, EventType
 
 from magpie import Magpie, crunch_reminder
@@ -35,40 +35,40 @@ def test_add_task1():
 	clear_enviroment()
 	magpie = Magpie()
 
-	assert len(BACKLOG) == 0
+	assert backlog_len() == 0
 
 	response = magpie.request("user1", "/task_add task42")
 
 	assert response == "task42 has been added."
-	assert len(BACKLOG) == 1
-	assert BACKLOG["task42"] == Task("task42", set(), TaskStatus.NEW)
+	assert backlog_len() == 1
+	assert fetch_task("task42") == Task("task42", set(), TaskStatus.NEW)
 
 
 def test_add_task2():
 	clear_enviroment()
 	magpie = Magpie()
 
-	assert len(BACKLOG) == 0
+	assert backlog_len() == 0
 
 	response = magpie.request("user1", "/task_add task1 tag2 tag1")
 
 	assert response == "task1 has been added.\ntask1 relates to tag1, tag2."
-	assert len(BACKLOG) == 1
-	assert BACKLOG["task1"] == Task("task1", {"tag1", "tag2"}, TaskStatus.NEW)
+	assert backlog_len() == 1
+	assert fetch_task("task1") == Task("task1", {"tag1", "tag2"}, TaskStatus.NEW)
 
 
 def test_add_tasks1():
 	clear_enviroment()
 	magpie = Magpie()
 
-	assert len(BACKLOG) == 0
+	assert backlog_len() == 0
 
 	magpie.request("user1", "/task_add task1 tag1 tag2")
 	magpie.request("user1", "/task_add task2 tag2")
 
-	assert len(BACKLOG) == 2
-	assert BACKLOG["task1"] == Task("task1", {"tag1", "tag2"}, TaskStatus.NEW)
-	assert BACKLOG["task2"] == Task("task2", {"tag2"}, TaskStatus.NEW)
+	assert backlog_len() == 2
+	assert fetch_task("task1") == Task("task1", {"tag1", "tag2"}, TaskStatus.NEW)
+	assert fetch_task("task2") == Task("task2", {"tag2"}, TaskStatus.NEW)
 
 
 def test_backlog():
@@ -88,7 +88,7 @@ def test_backlog():
 	magpie.request("user1", "/task_add task3 tag1 tag3")
 	response = magpie.request("user1", "/backlog")	
 
-	assert len(BACKLOG) == 3
+	assert backlog_len() == 3
 	assert response == "backlog:\ntask1: tag1, tag2\ntask2: tag3\ntask3: tag1, tag3"
 
 
@@ -103,7 +103,7 @@ def test_start_stop_single_user():
 
 	response = magpie.request("user1", "/task_start task1")
 
-	assert BACKLOG["task1"] == Task("task1", {"tag1", "tag2", "tag3"}, TaskStatus.IN_PROGRESS)
+	assert fetch_task("task1") == Task("task1", {"tag1", "tag2", "tag3"}, TaskStatus.IN_PROGRESS)
 	assert TASK_PERFORM_LOG[("user1", "task1")] == TaskPerform("user1", "task1", 0, [0])
 	assert SESSIONS["task1"] == {"user1"}
 	assert response == "you started working on task1.\n" \
@@ -114,7 +114,7 @@ def test_start_stop_single_user():
 	response = magpie.request("user1", "/task_stop task1")
 
 	assert len(SESSIONS) == 0
-	assert BACKLOG["task1"] == Task("task1", {"tag1", "tag2", "tag3"}, TaskStatus.SUSPENDED)
+	assert fetch_task("task1") == Task("task1", {"tag1", "tag2", "tag3"}, TaskStatus.SUSPENDED)
 	assert TASK_PERFORM_LOG[("user1", "task1")] == TaskPerform("user1", "task1", 4, [4])
 	assert response == "you have finished work on task1.\n" \
 					   "a total of 4.0 hours were spent on task1.\n" \
@@ -168,7 +168,7 @@ def test_start_stop_many_users():
 	magpie.request("developer1", "/task_stop task1")
 
 	assert SESSIONS["task1"] == {"developer2"}
-	assert BACKLOG["task1"] == Task("task1", {"tag1", "tag2"}, TaskStatus.IN_PROGRESS)
+	assert fetch_task("task1") == Task("task1", {"tag1", "tag2"}, TaskStatus.IN_PROGRESS)
 	assert TASK_PERFORM_LOG[("developer1", "task1")] == TaskPerform("developer1", "task1", 5, [5])
 	assert TASK_PERFORM_LOG[("developer2", "task1")] == TaskPerform("developer2", "task1", 3, [3])
 
@@ -176,7 +176,7 @@ def test_start_stop_many_users():
 	magpie.request("developer2", "/task_stop task1")
 
 	assert len(SESSIONS) == 0
-	assert BACKLOG["task1"] == Task("task1", {"tag1", "tag2"}, TaskStatus.SUSPENDED)
+	assert fetch_task("task1") == Task("task1", {"tag1", "tag2"}, TaskStatus.SUSPENDED)
 	assert TASK_PERFORM_LOG[("developer1", "task1")] == TaskPerform("developer1", "task1", 5, [5])
 	assert TASK_PERFORM_LOG[("developer2", "task1")] == TaskPerform("developer2", "task1", 3 + 1, [3 + 1])		
 
@@ -187,16 +187,16 @@ def test_add_tags():
 
 	magpie.request("manager", "/task_add task1")
 
-	assert len(BACKLOG["task1"].tags) == 0
+	assert len(fetch_task("task1").tags) == 0
 
 	response = magpie.request("manager", "/tag_add task1 tag1")
 
-	assert BACKLOG["task1"].tags == {"tag1"}
+	assert fetch_task("task1").tags == {"tag1"}
 	assert response == "tags for task1 updated. task1 now relates to tag1."
 
 	response = magpie.request("developer", "/tag_add task1 tag2 tag3")
 
-	assert BACKLOG["task1"].tags == {"tag1", "tag2", "tag3"}
+	assert fetch_task("task1").tags == {"tag1", "tag2", "tag3"}
 	assert response == "tags for task1 updated. task1 now relates to tag1, tag2, tag3."
 
 
