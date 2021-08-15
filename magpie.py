@@ -105,11 +105,10 @@ class Magpie:
 		
 		total_time_spent = 0
 		sessions_time_spent = 0
-		for perform_id in TASK_PERFORM_LOG:
-			if perform_id[1] == task.task_id:
-				perform = TASK_PERFORM_LOG[perform_id] 
+		for perform in TASK_PERFORM_LOG.values():
+			if perform.task_id == task.task_id:
 				total_time_spent += perform.total_time_spent
-				if perform_id[0] == user: sessions_time_spent += perform.sessions_time_spent[-1]
+				if perform.performer_id == user: sessions_time_spent += perform.sessions_time_spent[-1]
 
 		SESSIONS[task.task_id].remove(user)
 		if len(SESSIONS[task.task_id]) == 0:
@@ -134,6 +133,7 @@ class Magpie:
 			   % (task.task_id, task.task_id, task.tags_str())
 
 
+	def __crunch_threshold(): return 8.0
 	def __dispatch_events(self, user, args):
 		all_tasks = list(fetch_all_tasks_ids())
 		all_tasks.sort()
@@ -144,12 +144,11 @@ class Magpie:
 			total_time_spent = 0
 			task_alerts = ""
 
-			for perform_id in TASK_PERFORM_LOG.keys():
-				if perform_id[1] == task.task_id:
-					perform = TASK_PERFORM_LOG[perform_id]
+			for perform in TASK_PERFORM_LOG.values():
+				if perform.task_id == task.task_id:
 					total_time_spent += perform.total_time_spent
 					for session_time in perform.sessions_time_spent:
-						if session_time >= 8: 
+						if session_time >= Magpie.__crunch_threshold(): 
 							task_alerts += "% s spent %1.1f hours on % s in a single session.\n" \
 											% (perform.performer_id, session_time, perform.task_id)
 
