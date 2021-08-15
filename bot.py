@@ -5,6 +5,7 @@ import datetime
 
 from magpie import Magpie
 from task import SEND_MESSAGE_TO, update_enviroment_loop, update_mailbox_loop
+import playground
 
 with open('TOKEN') as f:
     TOKEN = f.readline()
@@ -33,13 +34,8 @@ def magpie_request(update, context):
 message_handler = MessageHandler(Filters.command, magpie_request)
 dispatcher.add_handler(message_handler) 
 
-init_commands = [
-        "/task_add task1 tag1 tag2",
-        "/task_add task2 tag3",
-        "/task_add task3 tag1 tag2 tag3"
-    ]
 magpie.init_default_event_handlers()
-magpie.request_list("init", init_commands)
+playground.init(magpie)
 
 update_enviroment_loop()
 update_mailbox_loop()
