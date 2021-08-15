@@ -59,8 +59,10 @@ def update_enviroment_loop():
 def update_mailbox_loop():
 	def action():
 		for mail in MAILBOX:
-			print("sending message to % s: % s" % (mail[0], mail[1]))
-			SEND_MESSAGE_TO[mail[0]](mail[1])
+			if mail[0] in SEND_MESSAGE_TO:
+				print("sending message to % s: % s" % (mail[0], mail[1]))
+				SEND_MESSAGE_TO[mail[0]](mail[1])
+			else: print("no adress for % s. can't send message '% s'" % (mail[0], mail[1]))
 		MAILBOX.clear()
 
 	run_atomic_state_action(action)
