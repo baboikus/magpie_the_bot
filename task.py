@@ -28,7 +28,7 @@ def run_atomic_state_action(action, args=None):
 		raise e 
 
 def new_event(task_id, event):
-	if task_id in EVENTS_LOG: EVENTS_LOG[task_id] += event
+	if task_id in EVENTS_LOG: EVENTS_LOG[task_id] += [event]
 	else: EVENTS_LOG[task_id] = [event] 
 
 def new_mail(user_id, message):
@@ -100,7 +100,7 @@ class TaskStatus(Enum):
 	NEW = 2
 	IN_PROGRESS = 3
 	SUSPENDED = 4
-	COMPLETE = 5
+	DONE = 5
 
 
 class Task:

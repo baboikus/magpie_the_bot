@@ -34,6 +34,7 @@ class Magpie:
 				elif command == "/events": response = self.__dispatch_events(user, args) 
 				elif command == "/task_start": response = self.__dispatch_start(user, args)
 				elif command == "/task_stop": response = self.__dispatch_stop(user, args)
+				elif command == "/task_done": response = self.__dispatch_done(user, args) 
 				elif command == "/help": response = self.__dispatch_help(user, args)
 				elif command == "/daily_report" \
 					or command == "/weekly_report": response = "there is no implementations for '% s' command. YET." % command
@@ -116,6 +117,15 @@ class Magpie:
 			task.status = TaskStatus.SUSPENDED
 
 		return messages.task_stop_response(task.task_id, total_time_spent, sessions_time_spent)
+
+
+	def __dispatch_done(self, user, args):
+		task_id = args[0]
+		fetch_task(task_id).status = TaskStatus.DONE
+
+		new_event(task_id, "✅ % s marked task as done." % (user))
+
+		return "you marked % s as done." % (task_id)
 
 
 	def __dispatch_tag_add(self, user, args):

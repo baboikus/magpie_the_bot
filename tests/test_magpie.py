@@ -290,10 +290,33 @@ def test_weekly_report():
 	assert response == "there is no implementations for '/weekly_report' command. YET."
 
 
+def test_task_done():
+	clear_enviroment()
+	magpie = Magpie()
+
+	magpie.request("manager", "/task_add task1 tag1")
+
+	assert fetch_task("task1") == Task("task1", {"tag1"}, TaskStatus.NEW)
+
+	response = magpie.request("manager", "/task_done task1")
+
+	assert fetch_task("task1") == Task("task1", {"tag1"}, TaskStatus.DONE)
+	assert response == "you marked task1 as done."
 
 
+def test_events_task_done():
+	clear_enviroment()
+	magpie = Magpie()
 
+	magpie.request("manager", "/task_add task1 tag1")
+	response = magpie.request("developer", "/task_done task1")
 
+	response = magpie.request("manager", "/events")
+
+	assert response == "events for task1:\n" \
+		   "ℹ️ task relates to tag1.\n" \
+		   "✅ developer marked task as done.\n" \
+		   "\n" \
 
 
 

@@ -4,7 +4,7 @@ class Oracul:
 	def predict(self, tags, performers):
 		similar_tasks_by_tags = set()
 		for task in BACKLOG.values():
-			if task.status == TaskStatus.COMPLETE and task.tags == tags :
+			if task.status == TaskStatus.DONE and task.tags == tags :
 				similar_tasks_by_tags.add(task.task_id)
 
 		if len(similar_tasks_by_tags) == 0: return {}

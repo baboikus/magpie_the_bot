@@ -6,7 +6,7 @@ def test_time_machine():
 	Task("task_id1", {}, TaskStatus.IN_PROGRESS)
 	Task("task_id2", {}, TaskStatus.NEW)
 	Task("task_id3", {}, TaskStatus.SUSPENDED)
-	Task("task_id4", {}, TaskStatus.COMPLETE)
+	Task("task_id4", {}, TaskStatus.DONE)
 
 	TaskPerform("performer_id1", "task_id1", 2)
 	TaskPerform("performer_id2", "task_id1", 0)

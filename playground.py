@@ -16,6 +16,7 @@ def init_command_list():
 		("developer1", "/task_stop change_ok_button_color"),
 		("time_master", "/admin_time_machine 1.5"),
 		("developer2", "/task_stop change_ok_button_color"),
+		("developer2", "/task_done change_ok_button_color"),
 
 		("time_master", "/admin_time_machine 3.5"),
 		("developer3", "/task_start move_build_scripts"),

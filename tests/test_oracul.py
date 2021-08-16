@@ -4,7 +4,7 @@ from oracul import Oracul
 def test_prediction1():
 	clear_enviroment()
 
-	task1 = Task("#task_id1", {"tag1", "tag2", "tag3"}, TaskStatus.COMPLETE)
+	task1 = Task("#task_id1", {"tag1", "tag2", "tag3"}, TaskStatus.DONE)
 
 	task_perform1 = TaskPerform("#performer_id1","#task_id1", 10.5)
 	task_perform2 = TaskPerform("#performer_id2","#task_id1", 6.0)
@@ -19,8 +19,8 @@ def test_prediction1():
 def test_prediction2():
 	clear_enviroment()
 
-	task1 = Task("#task_id1", {"tag1", "tag2", "tag3"}, TaskStatus.COMPLETE)
-	task2 = Task("#task_id2", {"tag1", "tag2", "tag3"}, TaskStatus.COMPLETE)
+	task1 = Task("#task_id1", {"tag1", "tag2", "tag3"}, TaskStatus.DONE)
+	task2 = Task("#task_id2", {"tag1", "tag2", "tag3"}, TaskStatus.DONE)
 
 	TaskPerform("#performer_id1","#task_id1", 10.5)
 	TaskPerform("#performer_id2","#task_id1", 6.0)
@@ -38,8 +38,8 @@ def test_prediction2():
 def test_prediction3():
 	clear_enviroment()
 
-	task1 = Task("#task_id1", {"tag1", "tag2", "tag3"}, TaskStatus.COMPLETE)
-	task2 = Task("#task_id2", {"tag1", "tag2", "tag3"}, TaskStatus.COMPLETE)
+	task1 = Task("#task_id1", {"tag1", "tag2", "tag3"}, TaskStatus.DONE)
+	task2 = Task("#task_id2", {"tag1", "tag2", "tag3"}, TaskStatus.DONE)
 
 	TaskPerform("#performer_id1","#task_id1", 10.5)
 	TaskPerform("#performer_id2","#task_id1", 6.0)
