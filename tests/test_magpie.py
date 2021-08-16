@@ -226,9 +226,9 @@ def test_events_spent_time():
 	response = magpie.request("manager", "/events")
 
 	assert response == "events for task1:\n" \
-		   "a total of 15.0 hours were spent on task1.\n" \
-		   "task1 relates to tag1, tag2.\n" \
-		   "developer1 spent 9.0 hours on task1 in a single session.\n" \
+		   "⏱ a total of 15.0 hours were spent on task.\n" \
+		   "ℹ️ task relates to tag1, tag2.\n" \
+		   "⚠️ developer1 spent 9.0 hours on task in a single session.\n" \
 		   "\n" \
 		   "no events for task2.\n" \
 		   "\n"
@@ -246,8 +246,8 @@ def test_events_new_tags():
 	response = magpie.request("manager", "/events")
 
 	assert response == "events for task1:\n" \
-		   "task1 relates to tag1, tag2, tag3.\n" \
-		   "developer1 added new tags for task1: tag3.\n" \
+		   "ℹ️ task relates to tag1, tag2, tag3.\n" \
+		   "➕ developer1 added new tags for task: tag3.\n" \
 		   "\n" \
 
 
@@ -269,7 +269,7 @@ def test_crunch_reminder():
 	assert len(EVENTS_LOG) == 0
 	assert len(MAILBOX) == 1
 
-	assert MAILBOX == [("developer1", "you are working on task1 over 8 hours.")]
+	assert MAILBOX == [("developer1", "⚠️ you are working on task1 over 8 hours.")]
 
 
 def test_daily_report():

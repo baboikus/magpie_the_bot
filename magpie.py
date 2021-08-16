@@ -5,7 +5,7 @@ import utils
 import messages
 
 def crunch_reminder(perform):
-	new_mail(perform.performer_id, "you are working on % s over 8 hours." % (perform.task_id))
+	new_mail(perform.performer_id, "⚠️ you are working on % s over 8 hours." % (perform.task_id))
 
 
 class Magpie:
@@ -126,8 +126,8 @@ class Magpie:
 
 		tags = list(tags)
 		new_event(task.task_id, 
-				  "% s added new tags for % s: % s." \
-				  % (user, task.task_id, utils.make_sorted_str(tags)))
+				  "➕ % s added new tags for task: % s." \
+				  % (user, utils.make_sorted_str(tags)))
 
 		return "tags for % s updated. % s now relates to % s." \
 			   % (task.task_id, task.task_id, task.tags_str())
@@ -149,8 +149,8 @@ class Magpie:
 					total_time_spent += perform.total_time_spent
 					for session_time in perform.sessions_time_spent:
 						if session_time >= Magpie.__crunch_threshold(): 
-							task_alerts += "% s spent %1.1f hours on % s in a single session.\n" \
-											% (perform.performer_id, session_time, perform.task_id)
+							task_alerts += "⚠️ % s spent %1.1f hours on task in a single session.\n" \
+											% (perform.performer_id, session_time)
 
 			for event in EVENTS_LOG.get(task.task_id, []):
 				task_alerts += event + "\n"
@@ -158,9 +158,9 @@ class Magpie:
 			if total_time_spent > 0 or len(task_alerts) > 0:
 				response += "events for % s:\n" % (task.task_id)
 				if total_time_spent > 0:
-					response += "a total of %1.1f hours were spent on % s.\n" % (total_time_spent, task.task_id)
+					response += "⏱ " + ("a total of %1.1f hours were spent on task.\n" % (total_time_spent))
 				tags_str = task.tags_str()
-				if len(tags_str) > 0: response += "% s relates to % s.\n" % (task.task_id, tags_str)
+				if len(tags_str) > 0: response += "ℹ️ task relates to % s.\n" % (tags_str)
 				response += task_alerts
 			else: response += "no events for %s.\n" % (task.task_id)
 			response += "\n"
