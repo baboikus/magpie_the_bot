@@ -72,12 +72,34 @@ class Magpie:
 	def __dispatch_backlog(self, user, args):
 		if backlog_len() == 0: return "backlog is empty."
 
-		#TODO добавить сортировку бэклога по статусам
 		#TODO добавить строчку с текущими исполнителями по каждой задаче
-		#TODO добавить эмоджи
 		response = "backlog:"
+		new_tasks = ""
+		new_tasks_counter = 0
+		in_progress_tasks = ""
+		in_progress_tasks_counter = 0
+		done_tasks = ""
+		done_tasks_counter = 0
+
 		for task in fetch_all_tasks():
-			response += "\n% s: %s" % (task.task_id, task.tags_str())
+			task_str = "\n% s relates to % s." % (task.task_id, task.tags_str())
+			if task.status == TaskStatus.NEW: 
+				new_tasks += task_str
+				new_tasks_counter += 1
+			elif task.status == TaskStatus.IN_PROGRESS: 
+				in_progress_tasks += task_str
+				in_progress_tasks_counter += 1
+			elif task.status == TaskStatus.DONE: 
+				done_tasks += task_str
+				done_tasks_counter += 1
+
+		if new_tasks_counter > 0:
+			response += "\n🐦 NEW(% s):% s" % (new_tasks_counter, new_tasks)
+		if in_progress_tasks_counter > 0:
+			response += "\n🛠 IN PROGRESS(% s):% s" % (in_progress_tasks_counter, in_progress_tasks)
+		if done_tasks_counter > 0: 
+			response += "\n✅ DONE(% s):% s" % (done_tasks_counter, done_tasks)
+
 		return response
 
 

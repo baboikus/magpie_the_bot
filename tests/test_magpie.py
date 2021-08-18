@@ -89,16 +89,26 @@ def test_backlog():
 	assert response == "backlog is empty."
 
 	magpie.request("user1", "/task_add task1 tag1 tag2")
+	magpie.request("user1", "/task_add task2 tag2")
+	magpie.request("user1", "/task_add task3 tag1 tag2 tag3")
 	response = magpie.request("user1", "/backlog")
 
-	assert response == "backlog:\ntask1: tag1, tag2"
+	assert response == "backlog:\n" \
+										 "🐦 NEW(3):\n" \
+										 "task1 relates to tag1, tag2.\n" \
+										 "task2 relates to tag2.\n" \
+										 "task3 relates to tag1, tag2, tag3."
 
-	magpie.request("user1", "/task_add task2 tag3")
-	magpie.request("user1", "/task_add task3 tag1 tag3")
+	magpie.request("user2", "/task_start task1")
+	magpie.request("user3", "/task_done task2")
+
 	response = magpie.request("user1", "/backlog")	
 
 	assert backlog_len() == 3
-	assert response == "backlog:\ntask1: tag1, tag2\ntask2: tag3\ntask3: tag1, tag3"
+	assert response == "backlog:\n" \
+										 "🐦 NEW(1):\ntask3 relates to tag1, tag2, tag3.\n" \
+										 "🛠 IN PROGRESS(1):\ntask1 relates to tag1, tag2.\n" \
+										 "✅ DONE(1):\ntask2 relates to tag2."
 
 
 def test_start_stop_single_user():
