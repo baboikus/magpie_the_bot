@@ -1,0 +1,60 @@
+sequenceDiagram
+    participant TeamLead
+    participant Bot
+    participant DeveloperA
+    participant DeveloperB
+
+    Note over TeamLead, Bot: Добавляет в бэклог новую задачу
+    TeamLead->>Bot: /task_add №42_миграция_бд sql server 12sp
+    Bot-->>TeamLead: Задача №42_миграция_бд добавлена.<br/>Задача связана с "sql", "server", "12sp".
+
+    Note over DeveloperA: Выбирает себе задачу
+    DeveloperA->>Bot: /backlog
+    Bot-->>DeveloperA: Текущий бэклог:<br/> №42_миграция_бд: sql, server, 12sp
+
+    Note over DeveloperA: Начинает<br/>работать над задачей
+    DeveloperA->>Bot: /task_start №42_миграция_бд
+    Bot-->>DeveloperA: Теперь вы работаете над №42_миграция_бд.<br/>Всего на задачу потрачено 0 часов.
+    
+    loop В течении 4 часов
+        DeveloperA->>DeveloperA: Работает над №42_миграция_бд
+    end
+
+    Note over DeveloperB: Начинает<br/>работать над №42_миграция_бд
+    DeveloperB->>Bot: /task_start №42_миграция_бд
+    Bot-->>DeveloperB: Над №42_миграция_бд сейчас работают DeveloperA.<br/>Всего на задачу потрачено 4 часа.
+    loop В течении 2 часов
+        DeveloperB->>DeveloperB: Работает над №42_миграция_бд
+    end
+
+    Note over DeveloperA: Заканчивает<br/>работать над №42_миграция_бд
+    DeveloperA->>Bot: /task_stop №42_миграция_бд
+    Bot-->>DeveloperA: Вы закончили работать над №42_миграция_бд.<br/> Всего на задачу потрачено 8 часов.<br/>Сегодня вы потратили на задачу 6 часов.<br/>Не забудьте отметить затраченное время. 
+
+    Note over DeveloperB: Обнаружил, что №42_миграция_бд<br/>связана с новым тегом
+    DeveloperB->>Bot: /tag_add №42_миграция_бд python
+    Bot-->>DeveloperB: Набор тегов для №42_миграция_бд обновлён.
+
+    loop В течении 7 часов
+        DeveloperB->>DeveloperB: Работает над №42_миграция_бд
+    end
+
+   
+    Note over Bot: Бот напоминает<br/>разработчику о переработке.
+    rect rgb(255, 190, 190)
+    Bot-->>DeveloperB: Вы работаете над №42_миграция_бд<br/>непрерывно более 8 часов.
+    end
+
+    Note over DeveloperB: Заканчивает<br/>работать над №42_миграция_бд
+    DeveloperB->>Bot: /task_stop №42_миграция_бд
+    Bot-->>DeveloperB: Вы закончили работать над №42_миграция_бд.<br/>Всего на задачу потрачено 15 часов.<br/>Сегодня вы потратили на задачу 9 часов.<br/>Не забудьте отметить затраченное время. 
+
+    Note over Bot: Бот формирует ежедневный отчёт о важных событиях.
+    rect rgb(190, 190, 255)
+    Bot-->>TeamLead: На задачу №42_миграция_бд потрачено 15 часов.<br/>Теги задачи: 12sp, python, server, sql.<br/>DeveloperB работал над задачей более 8 часов подряд<br/>и добавил новый тег "python".
+    end
+
+    Note over Bot: Бот формирует ежедневный отчёт о сроках.
+    rect rgb(190, 190, 255)
+    Bot-->>TeamLead: Для решения всех задач требуется ещё 12 часов. 
+    end
