@@ -2,6 +2,7 @@ from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
 
 import datetime
+import os
 
 from magpie import Magpie
 from task import SEND_MESSAGE_TO, update_enviroment_loop, update_mailbox_loop
@@ -9,6 +10,7 @@ import playground
 
 with open('TOKEN') as f:
     TOKEN = f.readline()
+if TOKEN == "": TOKEN = os.environ['MAGPIE_THE_BOT_TOKEN']
 
 updater = Updater(token=TOKEN, use_context=True)
 dispatcher = updater.dispatcher
