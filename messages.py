@@ -1,4 +1,5 @@
 COMMANDS = [
+	#TODO добавить описание для /task_done
 	("events", "", "show important events", "show all important performers and tasks events."),
 	("daily_report", "", "show daily report", "show daily report describing probable risks and predictive analytics."),
 	("help", "", "show command description", "show full description for complete list of commands."),

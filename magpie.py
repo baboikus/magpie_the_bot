@@ -5,6 +5,7 @@ import utils
 import messages
 
 def crunch_reminder(perform):
+	#TODO сделать одиночную отправку сообщений. сейчас отправка каждые N минут.
 	new_mail(perform.performer_id, "⚠️ you are working on % s over 8 hours." % (perform.task_id))
 
 
@@ -71,9 +72,12 @@ class Magpie:
 	def __dispatch_backlog(self, user, args):
 		if backlog_len() == 0: return "backlog is empty."
 
+		#TODO добавить сортировку бэклога по статусам
+		#TODO добавить строчку с текущими исполнителями по каждой задаче
+		#TODO добавить эмоджи
 		response = "backlog:"
 		for task in fetch_all_tasks():
-			response += "\n% s: %s" % (task.task_id, utils.make_sorted_str(task.tags))
+			response += "\n% s: %s" % (task.task_id, task.tags_str())
 		return response
 
 
@@ -85,6 +89,7 @@ class Magpie:
 		task = fetch_task(args[0])
 		task.status = TaskStatus.IN_PROGRESS
 
+		#TODO добавить эмоджи
 		if not (user, task.task_id) in TASK_PERFORM_LOG: TaskPerform(user, task.task_id, 0, [])
 		TASK_PERFORM_LOG[(user, task.task_id)].sessions_time_spent += [0] 
 		
