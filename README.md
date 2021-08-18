@@ -26,9 +26,11 @@ Put your token key from telegram BotFather into new TOKEN file and then just run
 
     /task_add <task_id> [<tag1> ... <tagN>] - add task <task_id> with specific tags <tag1>, ... , <tagN> to current backlog.
 
-    /task_start <task_id> - start new working session on the task <task_id>.
+    /task_start <task_id> - start new working session on the task <task_id>. marking task in progress.
 
-    /task_stop <task_id> - stop current working session on the task <task_id>.
+    /task_stop <task_id> - stop current working session on the task <task_id>. suspend task if no one else working on task currently.
+
+    /task_done <task_id> - marking task <task_id> as done.
 
     /tag_add <task_id> [<tag1> ... <tagN>] - add set of tags <tag1>, ... , <tagN> to task <task_id>.
 
