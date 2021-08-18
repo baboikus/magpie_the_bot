@@ -118,14 +118,13 @@ class Magpie:
 		task = fetch_task(args[0])
 		task.status = TaskStatus.IN_PROGRESS
 
-		#TODO добавить эмоджи
 		if not (user, task.task_id) in TASK_PERFORM_LOG: TaskPerform(user, task.task_id, 0, [])
 		TASK_PERFORM_LOG[(user, task.task_id)].sessions_time_spent += [0] 
 		
 		session = SESSIONS.get(task.task_id, set())
 		who_also_working_on_task_str = ""
-		if len(session) > 0: who_also_working_on_task_str = "% s currently working on % s also." % (utils.make_sorted_str(session), task.task_id)
-		else: who_also_working_on_task_str = "no one else currently working on % s." % (task.task_id)
+		if len(session) > 0: who_also_working_on_task_str = "🤝 % s currently working on % s also." % (utils.make_sorted_str(session), task.task_id)
+		else: who_also_working_on_task_str = "⭐️ no one else currently working on % s." % (task.task_id)
 
 		session.add(user)
 		SESSIONS[task.task_id] = session

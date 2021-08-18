@@ -133,7 +133,7 @@ def test_start_stop_single_user():
 	assert SESSIONS["task1"] == {"user1"}
 	assert response == "you started working on task1.\n" \
 					   "task1 relates to tag1, tag2, tag3.\n" \
-					   "no one else currently working on task1."
+					   "⭐️ no one else currently working on task1."
 
 	run_time_machine(4)
 	response = magpie.request("user1", "/task_stop task1")
@@ -179,14 +179,14 @@ def test_start_stop_many_users():
 	assert SESSIONS["task1"] == {"developer1", "developer2"}
 	assert response == "you started working on task1.\n" \
 					   "task1 relates to tag1, tag2.\n" \
-					   "developer1 currently working on task1 also."
+					   "🤝 developer1 currently working on task1 also."
 
 	response = magpie.request("developer3", "/task_start task1")
 
 	assert SESSIONS["task1"] == {"developer1", "developer2", "developer3"}
 	assert response == "you started working on task1.\n" \
 					   "task1 relates to tag1, tag2.\n" \
-					   "developer1, developer2 currently working on task1 also."
+					   "🤝 developer1, developer2 currently working on task1 also."
 
 	magpie.request("developer3", "/task_stop task1")
 	run_time_machine(3)
