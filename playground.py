@@ -23,7 +23,8 @@ def init_command_list():
 		("time_master", "/admin_time_machine 10.5"),
 		("developer3", "/task_stop move_build_scripts"),
 
-		("developer1", "/task_start speed_up_form_response")
+		("developer1", "/task_start speed_up_form_response"),
+		("time_master", "/admin_time_machine 1.0")
 	]
 
 
