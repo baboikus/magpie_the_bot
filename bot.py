@@ -8,9 +8,12 @@ from magpie import Magpie
 from task import SEND_MESSAGE_TO, update_enviroment_loop, update_mailbox_loop
 import playground
 
-with open('TOKEN') as f:
+try:
+  with open('TOKEN') as f:
     TOKEN = f.readline()
-if TOKEN == "": TOKEN = os.environ['MAGPIE_THE_BOT_TOKEN']
+except Exception as e:
+  print(e)
+  TOKEN = os.environ['MAGPIE_THE_BOT_TOKEN']
 
 updater = Updater(token=TOKEN, use_context=True)
 dispatcher = updater.dispatcher

@@ -45,7 +45,7 @@ class Magpie:
 			return run_atomic_state_action(action)
 
 		except Exception as e:
-			print(e);
+			print(e)
 			return "error occurred. use '/help' for list of avaible commands."
 
 
