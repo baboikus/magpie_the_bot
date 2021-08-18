@@ -78,6 +78,8 @@ class Magpie:
 		new_tasks_counter = 0
 		in_progress_tasks = ""
 		in_progress_tasks_counter = 0
+		suspended_tasks = ""
+		suspended_tasks_counter = 0
 		done_tasks = ""
 		done_tasks_counter = 0
 
@@ -89,12 +91,17 @@ class Magpie:
 			elif task.status == TaskStatus.IN_PROGRESS: 
 				in_progress_tasks += task_str
 				in_progress_tasks_counter += 1
+			elif task.status == TaskStatus.SUSPENDED:
+				suspended_tasks += task_str
+				suspended_tasks_counter += 1
 			elif task.status == TaskStatus.DONE: 
 				done_tasks += task_str
 				done_tasks_counter += 1
 
 		if new_tasks_counter > 0:
 			response += "\n🐦 NEW(% s):% s" % (new_tasks_counter, new_tasks)
+		if suspended_tasks_counter > 0:
+			response += "\n⏸ SUSPENDED(% s):% s" % (suspended_tasks_counter, suspended_tasks)
 		if in_progress_tasks_counter > 0:
 			response += "\n🛠 IN PROGRESS(% s):% s" % (in_progress_tasks_counter, in_progress_tasks)
 		if done_tasks_counter > 0: 

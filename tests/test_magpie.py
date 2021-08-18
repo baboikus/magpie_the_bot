@@ -99,14 +99,20 @@ def test_backlog():
 										 "task2 relates to tag2.\n" \
 										 "task3 relates to tag1, tag2, tag3."
 
+	magpie.request("user1", "/task_add task4")
 	magpie.request("user2", "/task_start task1")
 	magpie.request("user3", "/task_done task2")
+	magpie.request("user3", "/task_start task1")
+	magpie.request("user3", "/task_stop task1")
+	magpie.request("user3", "/task_start task4")
+	magpie.request("user3", "/task_stop task4")
 
 	response = magpie.request("user1", "/backlog")	
 
-	assert backlog_len() == 3
+	assert backlog_len() == 4
 	assert response == "backlog:\n" \
 										 "🐦 NEW(1):\ntask3 relates to tag1, tag2, tag3.\n" \
+										 "⏸ SUSPENDED(1):\ntask4 relates to .\n" \
 										 "🛠 IN PROGRESS(1):\ntask1 relates to tag1, tag2.\n" \
 										 "✅ DONE(1):\ntask2 relates to tag2."
 
