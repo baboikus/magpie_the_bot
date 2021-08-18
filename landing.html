@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<style>
+			* {
+				box-sizing: border-box;
+			}
+			.topView {
+				border: 1px outset red;
+				background-color: lightblue;
+				text-align: center;
+				margin-bottom: 4px;
+				height: 600px;
+			}
+
+			.middleView {
+				border: 1px outset red;
+				background-color: lightblue;
+				text-align: center;
+				margin-bottom: 4px;
+			}
+
+			.bottomView {
+				border: 1px outset red;
+				background-color: lightblue;
+				text-align: center;
+				margin-bottom: 4px;
+			}
+
+			.contactsView {
+				border: 1px outset red;
+				background-color: lightblue;
+				text-align: center;
+				margin-bottom: 4px;
+			}
+
+			/* Create three equal columns that floats next to each other */
+			.column {
+				border: 1px outset green;
+				float: left;
+				width: 33.33%;
+				height: 500px;
+				padding: 15px;
+			}
+
+			/* Clear floats after the columns */
+			.row:after {
+				content: "";
+				display: table;
+				clear: both;
+			}
+
+			/* Responsive layout - makes the three columns stack on top of each other instead of next to each other */
+			@media screen and (max-width:600px) {
+				.column {
+					width: 100%;
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<div>
+			magpie is here!
+		</div>
+
+		<div class="topView">
+			main logo + moto + picture + start now!
+			<div style="height:200px"></div>
+			<div><h1>Just let your team do their work and focus on big picture!</h1></div>
+			<div><h3>A lightway way to boost your team selfmanagment skills</h3></div>
+			<div>
+				<button>try it!</button>
+				<button>github</button>
+			</div>
+			<div style="height:50px"></div>
+			Magpie is telegram bot for team selfmanegement and effective collaboration
+		</div>
+
+		<div class="middleView">
+			<h2>What jobs bot do</h2>
+			<div class="row">
+				<div class="column">
+					keeps you informed of important events + picture
+				</div>
+				<div class="column">
+					predict risks and deadlines + picture
+				</div>
+				<div class="column">
+					collect data about tasks in a structure way + picture
+				</div>
+			</div>
+		</div>
+
+		<div class="bottomView">
+			<h2>All of the above does not interest me. What's the value to me?</h2>
+			<div class="row">
+				<div class="column">
+					time tracking without losing flow state + picture
+				</div>
+				<div class="column">
+					simple anti crunches solution + picture
+				</div>
+				<div class="column">
+					choose the most suitable task for you + picture
+				</div>
+			</div>
+		</div>
+
+		<div class="contactsView">
+			<ul>
+				<li>mail us</li>
+				<li>telegram channel</li>
+			</ul>
+		</div>
+
+	</body>
+
+</html>
