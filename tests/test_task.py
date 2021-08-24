@@ -1,4 +1,6 @@
-from task import BACKLOG, TASK_PERFORM_LOG, SESSIONS, clear_enviroment, run_time_machine, Task, TaskStatus, TaskPerform
+from task import (BACKLOG, SESSIONS, TASK_PERFORM_LOG, Task, TaskPerform,
+                  TaskStatus, clear_enviroment, run_time_machine)
+
 
 def test_time_machine():
 	clear_enviroment()

@@ -1,4 +1,6 @@
-from task import BACKLOG, TASK_PERFORM_LOG, clear_enviroment, Task, TaskStatus, TaskPerform
+from task import (BACKLOG, TASK_PERFORM_LOG, Task, TaskPerform, TaskStatus,
+                  clear_enviroment)
+
 
 class Oracul:
 	def predict(self, tags, performers):

@@ -1,8 +1,8 @@
-from task import TASK_PERFORM_LOG, SESSIONS, EVENTS_LOG, EVENT_HANDLERS, MAILBOX
-from task import clear_enviroment, run_time_machine, backlog_len, fetch_task
-from task import Task, TaskStatus, TaskPerform, EventType
-
 from magpie import Magpie, crunch_reminder
+from task import (EVENT_HANDLERS, EVENTS_LOG, MAILBOX, SESSIONS,
+                  TASK_PERFORM_LOG, EventType, Task, TaskPerform, TaskStatus,
+                  backlog_len, clear_enviroment, fetch_task, run_time_machine)
+
 
 def test_error():
 	clear_enviroment()

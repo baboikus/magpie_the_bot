@@ -1,12 +1,13 @@
-from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
-
 import datetime
 import os
 
+from telegram import Update
+from telegram.ext import (CallbackContext, CommandHandler, Filters,
+                          MessageHandler, Updater)
+
+import playground
 from magpie import Magpie
 from task import SEND_MESSAGE_TO, update_enviroment_loop, update_mailbox_loop
-import playground
 
 try:
   with open('TOKEN') as f:
@@ -21,6 +22,7 @@ dispatcher = updater.dispatcher
 magpie = Magpie()
 
 import logging
+
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 def magpie_request(update, context):

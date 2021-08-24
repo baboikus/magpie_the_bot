@@ -1,5 +1,6 @@
 from enum import Enum
-from threading import Timer, Lock
+from threading import Lock, Timer
+
 import utils
 
 BACKLOG = {}

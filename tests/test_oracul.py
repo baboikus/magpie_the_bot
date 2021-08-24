@@ -1,5 +1,7 @@
-from task import BACKLOG, TASK_PERFORM_LOG, clear_enviroment, Task, TaskStatus, TaskPerform 
 from oracul import Oracul
+from task import (BACKLOG, TASK_PERFORM_LOG, Task, TaskPerform, TaskStatus,
+                  clear_enviroment)
+
 
 def test_prediction1():
 	clear_enviroment()

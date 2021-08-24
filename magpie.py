@@ -1,8 +1,11 @@
-from task import TASK_PERFORM_LOG, SESSIONS, EVENTS_LOG, EVENT_HANDLERS
-from task import clear_enviroment, run_atomic_state_action, new_event, new_mail, run_time_machine, backlog_len, fetch_task, fetch_all_tasks, fetch_all_tasks_ids
-from task import Task, TaskStatus, TaskPerform, EventType
-import utils
 import messages
+import utils
+from task import (EVENT_HANDLERS, EVENTS_LOG, SESSIONS, TASK_PERFORM_LOG,
+                  EventType, Task, TaskPerform, TaskStatus, backlog_len,
+                  clear_enviroment, fetch_all_tasks, fetch_all_tasks_ids,
+                  fetch_task, new_event, new_mail, run_atomic_state_action,
+                  run_time_machine)
+
 
 def crunch_reminder(perform):
 	#TODO сделать одиночную отправку сообщений. сейчас отправка каждые N минут.
