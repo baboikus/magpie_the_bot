@@ -94,10 +94,10 @@ def test_backlog():
 	response = magpie.request("user1", "/backlog")
 
 	assert response == "backlog:\n" \
-										 "🐦 NEW(3):\n" \
-										 "task1 relates to tag1, tag2.\n" \
-										 "task2 relates to tag2.\n" \
-										 "task3 relates to tag1, tag2, tag3."
+			   "🐦 NEW(3):\n" \
+			   "task1 relates to tag1, tag2.\n" \
+			   "task2 relates to tag2.\n" \
+			   "task3 relates to tag1, tag2, tag3."
 
 	magpie.request("user1", "/task_add task4")
 	magpie.request("user2", "/task_start task1")
@@ -111,10 +111,10 @@ def test_backlog():
 
 	assert backlog_len() == 4
 	assert response == "backlog:\n" \
-										 "🐦 NEW(1):\ntask3 relates to tag1, tag2, tag3.\n" \
-										 "⏸ SUSPENDED(1):\ntask4 relates to .\n" \
-										 "🛠 IN PROGRESS(1):\ntask1 relates to tag1, tag2.\n" \
-										 "✅ DONE(1):\ntask2 relates to tag2."
+			   "🐦 NEW(1):\ntask3 relates to tag1, tag2, tag3.\n" \
+			   "⏸ SUSPENDED(1):\ntask4 relates to .\n" \
+			   "🛠 IN PROGRESS(1):\ntask1 relates to tag1, tag2.\n" \
+			   "✅ DONE(1):\ntask2 relates to tag2."
 
 
 def test_start_stop_single_user():
@@ -132,8 +132,8 @@ def test_start_stop_single_user():
 	assert TASK_PERFORM_LOG[("user1", "task1")] == TaskPerform("user1", "task1", 0, [0])
 	assert SESSIONS["task1"] == {"user1"}
 	assert response == "you started working on task1.\n" \
-					   "task1 relates to tag1, tag2, tag3.\n" \
-					   "⭐️ no one else currently working on task1."
+			   "task1 relates to tag1, tag2, tag3.\n" \
+			   "⭐️ no one else currently working on task1."
 
 	run_time_machine(4)
 	response = magpie.request("user1", "/task_stop task1")
@@ -142,9 +142,9 @@ def test_start_stop_single_user():
 	assert fetch_task("task1") == Task("task1", {"tag1", "tag2", "tag3"}, TaskStatus.SUSPENDED)
 	assert TASK_PERFORM_LOG[("user1", "task1")] == TaskPerform("user1", "task1", 4, [4])
 	assert response == "you have finished work on task1.\n" \
-					   "a total of 4.0 hours were spent on task1.\n" \
-					   "today you spent on task1 4.0 hours.\n" \
-					   "please mark the time spent." 
+			   "a total of 4.0 hours were spent on task1.\n" \
+			   "today you spent on task1 4.0 hours.\n" \
+			   "please mark the time spent."
 
 def test_time_format():
 	clear_enviroment()

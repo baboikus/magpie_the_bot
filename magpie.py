@@ -2,9 +2,8 @@ import messages
 import utils
 from task import (EVENT_HANDLERS, EVENTS_LOG, SESSIONS, TASK_PERFORM_LOG,
                   EventType, Task, TaskPerform, TaskStatus, backlog_len,
-                  clear_enviroment, fetch_all_tasks, fetch_all_tasks_ids,
-                  fetch_task, new_event, new_mail, run_atomic_state_action,
-                  run_time_machine)
+                  fetch_all_tasks, fetch_all_tasks_ids, fetch_task, new_event,
+                  new_mail, run_atomic_state_action, run_time_machine)
 
 
 def crunch_reminder(perform):
