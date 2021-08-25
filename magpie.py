@@ -8,7 +8,7 @@ from task import (EVENT_HANDLERS, EVENTS_LOG, SESSIONS, TASK_PERFORM_LOG,
 
 def crunch_reminder(perform):
 	#TODO сделать одиночную отправку сообщений. сейчас отправка каждые N минут.
-	new_mail(perform.performer_id, "⚠️ you are working on % s over 8 hours." % (perform.task_id))
+	new_mail(perform.performer_id, "⚠ you are working on % s over 8 hours." % (perform.task_id))
 
 
 class Magpie:
@@ -126,7 +126,7 @@ class Magpie:
 		session = SESSIONS.get(task.task_id, set())
 		who_also_working_on_task_str = ""
 		if len(session) > 0: who_also_working_on_task_str = "🤝 % s currently working on % s also." % (utils.make_sorted_str(session), task.task_id)
-		else: who_also_working_on_task_str = "⭐️ no one else currently working on % s." % (task.task_id)
+		else: who_also_working_on_task_str = "⭐ no one else currently working on % s." % (task.task_id)
 
 		session.add(user)
 		SESSIONS[task.task_id] = session
@@ -194,7 +194,7 @@ class Magpie:
 					total_time_spent += perform.total_time_spent
 					for session_time in perform.sessions_time_spent:
 						if session_time >= Magpie.__crunch_threshold(): 
-							task_alerts += "⚠️ % s spent %1.1f hours on task in a single session.\n" \
+							task_alerts += "⚠ % s spent %1.1f hours on task in a single session.\n" \
 											% (perform.performer_id, session_time)
 
 			for event in EVENTS_LOG.get(task.task_id, []):
@@ -205,7 +205,7 @@ class Magpie:
 				if total_time_spent > 0:
 					response += "⏱ " + ("a total of %1.1f hours were spent on task.\n" % (total_time_spent))
 				tags_str = task.tags_str()
-				if len(tags_str) > 0: response += "ℹ️ task relates to % s.\n" % (tags_str)
+				if len(tags_str) > 0: response += "ℹ task relates to % s.\n" % (tags_str)
 				response += task_alerts
 			else: response += "no events for %s.\n" % (task.task_id)
 			response += "\n"
