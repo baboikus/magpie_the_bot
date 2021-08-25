@@ -65,7 +65,7 @@ class Magpie:
 
 		task = Task(task_id, set(tags), TaskStatus.NEW)
 
-		response = "% s has been added." % (task.task_id)
+		response = "➕ % s has been added." % (task.task_id)
 		if len(task.tags) > 0:
 			response += "\n% s relates to % s." % (task.task_id, task.tags_str()) 
 		return response
@@ -103,11 +103,11 @@ class Magpie:
 		if new_tasks_counter > 0:
 			response += "\n🐦 NEW(% s):% s" % (new_tasks_counter, new_tasks)
 		if suspended_tasks_counter > 0:
-			response += "\n⏸ SUSPENDED(% s):% s" % (suspended_tasks_counter, suspended_tasks)
+			response += "\n\n⏸ SUSPENDED(% s):% s" % (suspended_tasks_counter, suspended_tasks)
 		if in_progress_tasks_counter > 0:
-			response += "\n🛠 IN PROGRESS(% s):% s" % (in_progress_tasks_counter, in_progress_tasks)
+			response += "\n\n🛠 IN PROGRESS(% s):% s" % (in_progress_tasks_counter, in_progress_tasks)
 		if done_tasks_counter > 0: 
-			response += "\n✅ DONE(% s):% s" % (done_tasks_counter, done_tasks)
+			response += "\n\n✅ DONE(% s):% s" % (done_tasks_counter, done_tasks)
 
 		return response
 
@@ -131,7 +131,7 @@ class Magpie:
 		session.add(user)
 		SESSIONS[task.task_id] = session
 
-		return "you started working on %s.\n" % (task.task_id) \
+		return "🛠 you started working on %s.\n" % (task.task_id) \
 			   + "% s relates to % s.\n" % (task.task_id, task.tags_str()) \
 			   + who_also_working_on_task_str
 
