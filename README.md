@@ -1,10 +1,17 @@
+<!---
+TODO add faq
+TODO add heroku quik start
+TODO add some sort of tutorial
+TODO add VISION proposal
+-->
+
 # Attention. There is still some work to be done.
 
 ## And what is this bot for?
 Magpie is telegram bot for team selfmanegement and effective collaboration
 
 ## Quickest start
-You need python3 installed.
+You need pip and python3 installed.
 
     $ pip install python-telegram-bot --upgrade
     $ git clone https://github.com/baboikus/magpie_the_bot.git
@@ -33,6 +40,3 @@ Put your token key from telegram BotFather into new TOKEN file and then just run
     /task_done <task_id> - marking task <task_id> as done.
 
     /tag_add <task_id> [<tag1> ... <tagN>] - add set of tags <tag1>, ... , <tagN> to task <task_id>.
-
-## FAQ
-tbd

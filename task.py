@@ -3,6 +3,8 @@ from threading import Lock, Timer
 
 import utils
 
+# TODO move global state interaction to abstract api
+# TODO add sqlite support(and manual heroku test!)
 BACKLOG = {}
 TASK_PERFORM_LOG = {}
 SESSIONS = {}
@@ -122,6 +124,7 @@ class TaskStatus(Enum):
     SUSPENDED = 4
     DONE = 5
 
+# TODO get rid of global state modification inside __init__ methods
 
 class Task:
     def __init__(self, task_id, tags, status):
