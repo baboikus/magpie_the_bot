@@ -1,7 +1,7 @@
 from magpie import Magpie, crunch_reminder
 from task import (EVENT_HANDLERS, EVENTS_LOG, MAILBOX, SESSIONS,
-                  TASK_PERFORM_LOG, EventType, Task, TaskPerform, TaskStatus,
-                  backlog_len, clear_enviroment, fetch_task, run_time_machine)
+                  EventType, Task, TaskPerform, TaskStatus,
+                  backlog_len, clear_enviroment, fetch_task, fetch_task_perform, run_time_machine)
 
 
 def test_error():
@@ -125,14 +125,11 @@ def test_start_stop_single_user():
 
     magpie.request("user1", "/task_add task1 tag1 tag2 tag3")
 
-    assert len(TASK_PERFORM_LOG) == 0
-    assert len(SESSIONS) == 0
-
     response = magpie.request("user1", "/task_start task1")
 
     assert fetch_task("task1") == Task(
         "task1", {"tag1", "tag2", "tag3"}, TaskStatus.IN_PROGRESS)
-    assert TASK_PERFORM_LOG[("user1", "task1")] == TaskPerform(
+    assert fetch_task_perform("task1", "user1") == TaskPerform(
         "user1", "task1", 0, [0])
     assert SESSIONS["task1"] == {"user1"}
     assert response == "🛠 you started working on task1.\n" \
@@ -145,7 +142,7 @@ def test_start_stop_single_user():
     assert len(SESSIONS) == 0
     assert fetch_task("task1") == Task(
         "task1", {"tag1", "tag2", "tag3"}, TaskStatus.SUSPENDED)
-    assert TASK_PERFORM_LOG[("user1", "task1")] == TaskPerform(
+    assert fetch_task_perform("task1", "user1") == TaskPerform(
         "user1", "task1", 4, [4])
     assert response == "⏸ you have finished work on task1.\n" \
                        "a total of 4.0 hours were spent on task1.\n" \
@@ -202,9 +199,9 @@ def test_start_stop_many_users():
     assert SESSIONS["task1"] == {"developer2"}
     assert fetch_task("task1") == Task(
         "task1", {"tag1", "tag2"}, TaskStatus.IN_PROGRESS)
-    assert TASK_PERFORM_LOG[("developer1", "task1")] == TaskPerform(
+    assert fetch_task_perform("task1", "developer1") == TaskPerform(
         "developer1", "task1", 5, [5])
-    assert TASK_PERFORM_LOG[("developer2", "task1")] == TaskPerform(
+    assert fetch_task_perform("task1", "developer2") == TaskPerform(
         "developer2", "task1", 3, [3])
 
     run_time_machine(1)
@@ -213,9 +210,9 @@ def test_start_stop_many_users():
     assert len(SESSIONS) == 0
     assert fetch_task("task1") == Task(
         "task1", {"tag1", "tag2"}, TaskStatus.SUSPENDED)
-    assert TASK_PERFORM_LOG[("developer1", "task1")] == TaskPerform(
+    assert fetch_task_perform("task1", "developer1") == TaskPerform(
         "developer1", "task1", 5, [5])
-    assert TASK_PERFORM_LOG[("developer2", "task1")] == TaskPerform(
+    assert fetch_task_perform("task1", "developer2") == TaskPerform(
         "developer2", "task1", 3 + 1, [3 + 1])
 
 

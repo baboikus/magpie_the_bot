@@ -37,6 +37,25 @@ def run_atomic_state_action(action, args=None):
         raise e
 
 
+def new_task(task):
+    BACKLOG[task.task_id] = task
+
+
+def new_task_perform(perform):
+    TASK_PERFORM_LOG[(perform.task_id, perform.performer_id)] = perform
+
+
+def fetch_task_perform(task_id, performer_id):
+    return TASK_PERFORM_LOG[(task_id, performer_id)]
+
+
+def add_session_performer(task_id, performer_id):
+    if task_id in SESSIONS:
+        SESSIONS[task_id].add(performer_id)
+    else:
+        SESSIONS[task_id] = {performer_id}
+
+
 def new_event(task_id, event):
     if task_id in EVENTS_LOG:
         EVENTS_LOG[task_id] += [event]
@@ -97,9 +116,9 @@ def run_time_machine(hours):
             if task.status == TaskStatus.IN_PROGRESS:
                 in_progress.add(task.task_id)
 
-        for perform_id in TASK_PERFORM_LOG.keys():
-            if perform_id[1] in in_progress:
-                perform = TASK_PERFORM_LOG[perform_id]
+        for task_id, performer_id in TASK_PERFORM_LOG.keys():
+            if task_id in in_progress:
+                perform = fetch_task_perform(task_id, performer_id)
                 if perform.performer_id in SESSIONS[perform.task_id]:
                     perform.total_time_spent += hours
                     perform.sessions_time_spent[-1] += hours
@@ -124,14 +143,15 @@ class TaskStatus(Enum):
     SUSPENDED = 4
     DONE = 5
 
-# TODO get rid of global state modification inside __init__ methods
+# TODO get rid of global state modifications inside __init__ methods
+
 
 class Task:
+    # TODO change task_id to id
     def __init__(self, task_id, tags, status):
         self.task_id = task_id
         self.tags = tags
         self.status = status
-        BACKLOG[task_id] = self
 
     def __eq__(self, other):
         return self.task_id == other.task_id \
@@ -145,8 +165,11 @@ class Task:
     def tags_str(self):
         return utils.make_sorted_str(self.tags)
 
+# TODO add UTC time data to sessions
+
 
 class TaskPerform:
+    # TODO switch performer_id and task_id places
     def __init__(self, performer_id, task_id, total_time_spent,
                  sessions_time_spent=None):
         self.performer_id = performer_id
@@ -156,7 +179,6 @@ class TaskPerform:
             self.sessions_time_spent = [total_time_spent]
         else:
             self.sessions_time_spent = sessions_time_spent
-        TASK_PERFORM_LOG[(performer_id, task_id)] = self
 
     def __repr__(self):
         return "TaskPerform performer_id:% s task_id:% s total_time_spent:% s sessions_time_spent: % s" \

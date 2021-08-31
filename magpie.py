@@ -2,17 +2,19 @@ import messages
 import utils
 from task import (EVENT_HANDLERS, EVENTS_LOG, SESSIONS, TASK_PERFORM_LOG,
                   EventType, Task, TaskPerform, TaskStatus, backlog_len,
-                  fetch_all_tasks, fetch_all_tasks_ids, fetch_task, new_event,
+                  new_task, new_task_perform, fetch_all_tasks, fetch_all_tasks_ids, fetch_task, fetch_task_perform, new_event,
                   new_mail, run_atomic_state_action, run_time_machine)
 
 
 def crunch_reminder(perform):
-    # TODO сделать одиночную отправку сообщений. сейчас отправка каждые N
-    # минут.
+    # TODO change notification to single push. at present bot  pushes notifications every N minutes
     new_mail(
         perform.performer_id,
         "⚠ you are working on % s over 8 hours." %
         (perform.task_id))
+
+# TODO add restriction single current task for perfromer
+# TODO add notification about start/stop/done task events for task current performers
 
 
 class Magpie:
@@ -78,6 +80,7 @@ class Magpie:
         tags = args[1:]
 
         task = Task(task_id, set(tags), TaskStatus.NEW)
+        new_task(task)
 
         response = "➕ % s has been added." % (task.task_id)
         if len(task.tags) > 0:
@@ -89,7 +92,7 @@ class Magpie:
         if backlog_len() == 0:
             return "backlog is empty."
 
-        # TODO добавить строчку с текущими исполнителями по каждой задаче
+        # TODO need addtional line with all current task performers
         response = "backlog:"
         new_tasks = ""
         new_tasks_counter = 0
@@ -138,8 +141,8 @@ class Magpie:
         task.status = TaskStatus.IN_PROGRESS
 
         if not (user, task.task_id) in TASK_PERFORM_LOG:
-            TaskPerform(user, task.task_id, 0, [])
-        TASK_PERFORM_LOG[(user, task.task_id)].sessions_time_spent += [0]
+            new_task_perform(TaskPerform(user, task.task_id, 0, []))
+        fetch_task_perform(task.task_id, user).sessions_time_spent += [0]
 
         session = SESSIONS.get(task.task_id, set())
         who_also_working_on_task_str = ""
