@@ -1,7 +1,7 @@
 from task import (Task, TaskPerform,
                   TaskStatus, clear_enviroment, run_time_machine,
                   new_task, new_task_perform, fetch_task_perform,
-                  add_session_performer)
+                  new_session)
 
 
 def test_time_machine():
@@ -15,8 +15,8 @@ def test_time_machine():
     new_task_perform(TaskPerform("performer_id1", "task_id1", 2))
     new_task_perform(TaskPerform("performer_id2", "task_id1", 0))
 
-    add_session_performer("task_id1", "performer_id1")
-    add_session_performer("task_id1", "performer_id2")
+    new_session("task_id1", "performer_id1")
+    new_session("task_id1", "performer_id2")
 
     new_task_perform(TaskPerform("performer_id1", "task_id2", 0))
     new_task_perform(TaskPerform("performer_id1", "task_id3", 6.2))

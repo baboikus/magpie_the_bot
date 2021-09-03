@@ -1,8 +1,8 @@
 from magpie import Magpie, crunch_reminder
-from task import (EVENT_HANDLERS, EVENTS_LOG, MAILBOX, SESSIONS,
+from task import (EVENT_HANDLERS, EVENTS_LOG, MAILBOX,
                   EventType, Task, TaskPerform, TaskStatus,
                   backlog_len, clear_enviroment, fetch_task, fetch_task_perform, run_time_machine)
-
+import task as storage
 
 def test_error():
     clear_enviroment()
@@ -131,7 +131,7 @@ def test_start_stop_single_user():
         "task1", {"tag1", "tag2", "tag3"}, TaskStatus.IN_PROGRESS)
     assert fetch_task_perform("task1", "user1") == TaskPerform(
         "user1", "task1", 0, [0])
-    assert SESSIONS["task1"] == {"user1"}
+    assert storage.fetch_all_task_sessions("task1") == {"user1"}
     assert response == "🛠 you started working on task1.\n" \
                        "task1 relates to tag1, tag2, tag3.\n" \
                        "⭐ no one else currently working on task1."
@@ -139,7 +139,7 @@ def test_start_stop_single_user():
     run_time_machine(4)
     response = magpie.request("user1", "/task_stop task1")
 
-    assert len(SESSIONS) == 0
+    assert not storage.is_have_any_sessions()
     assert fetch_task("task1") == Task(
         "task1", {"tag1", "tag2", "tag3"}, TaskStatus.SUSPENDED)
     assert fetch_task_perform("task1", "user1") == TaskPerform(
@@ -169,25 +169,25 @@ def test_start_stop_many_users():
     clear_enviroment()
     magpie = Magpie()
 
-    assert len(SESSIONS) == 0
+    assert not storage.is_have_any_sessions()
 
     magpie.request("manager", "/task_add task1 tag1 tag2")
     run_time_machine(1)
     magpie.request("developer1", "/task_start task1")
 
-    assert SESSIONS["task1"] == {"developer1"}
+    assert storage.fetch_all_task_sessions("task1") == {"developer1"}
 
     run_time_machine(2)
     response = magpie.request("developer2", "/task_start task1")
 
-    assert SESSIONS["task1"] == {"developer1", "developer2"}
+    assert storage.fetch_all_task_sessions("task1") == {"developer1", "developer2"}
     assert response == "🛠 you started working on task1.\n" \
                        "task1 relates to tag1, tag2.\n" \
                        "🤝 developer1 currently working on task1 also."
 
     response = magpie.request("developer3", "/task_start task1")
 
-    assert SESSIONS["task1"] == {"developer1", "developer2", "developer3"}
+    assert storage.fetch_all_task_sessions("task1") == {"developer1", "developer2", "developer3"}
     assert response == "🛠 you started working on task1.\n" \
                        "task1 relates to tag1, tag2.\n" \
                        "🤝 developer1, developer2 currently working on task1 also."
@@ -196,7 +196,7 @@ def test_start_stop_many_users():
     run_time_machine(3)
     magpie.request("developer1", "/task_stop task1")
 
-    assert SESSIONS["task1"] == {"developer2"}
+    assert storage.fetch_all_task_sessions("task1") == {"developer2"}
     assert fetch_task("task1") == Task(
         "task1", {"tag1", "tag2"}, TaskStatus.IN_PROGRESS)
     assert fetch_task_perform("task1", "developer1") == TaskPerform(
@@ -207,7 +207,7 @@ def test_start_stop_many_users():
     run_time_machine(1)
     magpie.request("developer2", "/task_stop task1")
 
-    assert len(SESSIONS) == 0
+    assert not storage.is_have_any_sessions()
     assert fetch_task("task1") == Task(
         "task1", {"tag1", "tag2"}, TaskStatus.SUSPENDED)
     assert fetch_task_perform("task1", "developer1") == TaskPerform(

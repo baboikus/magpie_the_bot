@@ -45,16 +45,40 @@ def new_task_perform(perform):
     TASK_PERFORM_LOG[(perform.task_id, perform.performer_id)] = perform
 
 
+def is_task_perform_exists(task_id, performer_id):
+    return (task_id, performer_id) in TASK_PERFORM_LOG
+
+def fetch_all_tasks_performs():
+    return TASK_PERFORM_LOG.values()
+
 def fetch_task_perform(task_id, performer_id):
     return TASK_PERFORM_LOG[(task_id, performer_id)]
 
+def is_have_any_sessions():
+    return len(SESSIONS) > 0
 
-def add_session_performer(task_id, performer_id):
+def new_session(task_id, performer_id):
     if task_id in SESSIONS:
         SESSIONS[task_id].add(performer_id)
     else:
         SESSIONS[task_id] = {performer_id}
 
+def new_task_session(task_id):
+    SESSIONS[task_id] = set()
+
+def fetch_all_task_sessions(task_id):
+    return SESSIONS.get(task_id, set())
+
+def remove_session(task_id, performer_id):
+    SESSIONS[task_id].remove(performer_id)
+    if len(SESSIONS[task_id]) == 0:
+        del SESSIONS[task_id]
+
+def is_task_have_sessions(task_id):
+    return task_id in SESSIONS and len(SESSIONS[task_id]) > 0
+
+def is_session_exist(task_id, performer_id):
+    return task_id in SESSIONS and performer_id in SESSIONS[task_id]
 
 def new_event(task_id, event):
     if task_id in EVENTS_LOG:
@@ -62,6 +86,8 @@ def new_event(task_id, event):
     else:
         EVENTS_LOG[task_id] = [event]
 
+def fetch_task_events(task_id):
+    return EVENTS_LOG.get(task_id, [])
 
 def new_mail(user_id, message):
     global MAILBOX

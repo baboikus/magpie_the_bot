@@ -1,9 +1,10 @@
 import messages
 import utils
-from task import (EVENT_HANDLERS, EVENTS_LOG, SESSIONS, TASK_PERFORM_LOG,
+from task import (EVENT_HANDLERS,
                   EventType, Task, TaskPerform, TaskStatus, backlog_len,
-                  new_task, new_task_perform, fetch_all_tasks, fetch_all_tasks_ids, fetch_task, fetch_task_perform, new_event,
-                  new_mail, run_atomic_state_action, run_time_machine)
+                  new_task, new_task_perform, fetch_all_tasks, fetch_all_tasks_ids, fetch_task, fetch_task_perform, new_event, fetch_task_events,
+                  is_task_perform_exists, fetch_all_tasks_performs, new_mail, run_atomic_state_action, run_time_machine,
+                  new_session, new_task_session, is_session_exist, remove_session, is_task_have_sessions, fetch_all_task_sessions)
 
 
 def crunch_reminder(perform):
@@ -36,6 +37,7 @@ class Magpie:
                 return messages.botfather_help()
             # <<< admin commands block
 
+            # TODO ?specific class for every command?
             def action():
                 response = ""
                 if command == "/task_add":
@@ -140,11 +142,13 @@ class Magpie:
         task = fetch_task(args[0])
         task.status = TaskStatus.IN_PROGRESS
 
-        if not (user, task.task_id) in TASK_PERFORM_LOG:
+        if not is_task_perform_exists(task.task_id, user):
             new_task_perform(TaskPerform(user, task.task_id, 0, []))
         fetch_task_perform(task.task_id, user).sessions_time_spent += [0]
 
-        session = SESSIONS.get(task.task_id, set())
+        if not is_task_have_sessions(task.task_id):
+            new_task_session(task.task_id)
+        session = fetch_all_task_sessions(task.task_id)
         who_also_working_on_task_str = ""
         if len(session) > 0:
             who_also_working_on_task_str = "🤝 % s currently working on % s also." % (
@@ -154,7 +158,6 @@ class Magpie:
                 task.task_id)
 
         session.add(user)
-        SESSIONS[task.task_id] = session
 
         return "🛠 you started working on %s.\n" % (task.task_id) \
             + "% s relates to % s.\n" % (task.task_id, task.tags_str()) \
@@ -165,15 +168,14 @@ class Magpie:
 
         total_time_spent = 0
         sessions_time_spent = 0
-        for perform in TASK_PERFORM_LOG.values():
+        for perform in fetch_all_tasks_performs():
             if perform.task_id == task.task_id:
                 total_time_spent += perform.total_time_spent
                 if perform.performer_id == user:
                     sessions_time_spent += perform.sessions_time_spent[-1]
 
-        SESSIONS[task.task_id].remove(user)
-        if len(SESSIONS[task.task_id]) == 0:
-            del SESSIONS[task.task_id]
+        remove_session(task.task_id, user)
+        if not is_task_have_sessions(task.task_id):
             task.status = TaskStatus.SUSPENDED
 
         return messages.task_stop_response(
@@ -212,7 +214,7 @@ class Magpie:
             total_time_spent = 0
             task_alerts = ""
 
-            for perform in TASK_PERFORM_LOG.values():
+            for perform in fetch_all_tasks_performs():
                 if perform.task_id == task.task_id:
                     total_time_spent += perform.total_time_spent
                     for session_time in perform.sessions_time_spent:
@@ -220,7 +222,7 @@ class Magpie:
                             task_alerts += "⚠ % s spent %1.1f hours on task in a single session.\n" \
                                 % (perform.performer_id, session_time)
 
-            for event in EVENTS_LOG.get(task.task_id, []):
+            for event in fetch_task_events(task.task_id):
                 task_alerts += event + "\n"
 
             if total_time_spent > 0 or len(task_alerts) > 0:
