@@ -15,11 +15,11 @@ MAILBOX = []
 
 SEND_MESSAGE_TO = {}
 
-EVIROMENT_MUTEX = Lock()
+ENVIRONMENT_MUTEX = Lock()
 
 
 def run_atomic_state_action(action, args=None):
-    EVIROMENT_MUTEX.acquire(1)
+    ENVIRONMENT_MUTEX.acquire(1)
     try:
         r = None
         if args is None:
@@ -30,10 +30,10 @@ def run_atomic_state_action(action, args=None):
             r = action(args[0], args[1])
         elif len(args) == 3:
             r = action(args[0], args[1], args[2])
-        EVIROMENT_MUTEX.release()
+        ENVIRONMENT_MUTEX.release()
         return r
     except Exception as e:
-        EVIROMENT_MUTEX.release()
+        ENVIRONMENT_MUTEX.release()
         raise e
 
 
